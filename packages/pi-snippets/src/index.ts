@@ -186,7 +186,7 @@ export default function (pi: ExtensionAPI): void {
     handler: async (_args, ctx) => openMenu(ctx),
   });
 
-  pi.registerShortcut("ctrl+e", {
+  pi.registerShortcut("ctrl+y", {
     description: "Toggle prompt snippets",
     handler: openMenu,
   });
