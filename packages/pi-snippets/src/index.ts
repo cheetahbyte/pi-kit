@@ -18,6 +18,7 @@ export default function (pi: ExtensionAPI): void {
   };
 
   const updateWidget = (ctx: ExtensionContext): void => {
+    if (!ctx.hasUI || ctx.mode !== "tui") return;
     const active = snippets.filter(({ id }) => enabled.has(id));
     const before = active.filter(({ placement }) => placement === "before");
     const after = active.filter(({ placement }) => placement === "after");
@@ -37,6 +38,7 @@ export default function (pi: ExtensionAPI): void {
     refresh();
     if (!snippets.length) {
       ctx.ui.notify(`No snippets found in ${snippetsDirectory}`, "warning");
+      updateWidget(ctx);
       return;
     }
 
