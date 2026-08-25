@@ -186,8 +186,10 @@ export default function (pi: ExtensionAPI): void {
     handler: async (_args, ctx) => openMenu(ctx),
   });
 
-  pi.registerShortcut("alt+s", {
-    description: "Toggle prompt snippets",
-    handler: openMenu,
-  });
+  for (const shortcut of ["alt+q"] as const) {
+    pi.registerShortcut(shortcut, {
+      description: "Toggle prompt snippets",
+      handler: openMenu,
+    });
+  }
 }
