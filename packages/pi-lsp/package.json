@@ -1,0 +1,19 @@
+{
+	"name": "@cheetahbyte/pi-lsp",
+	"private": true,
+	"type": "module",
+	"peerDependencies": {
+		"@earendil-works/pi-coding-agent": "*"
+	},
+	"pi": {
+		"extensions": [
+			"./src/index.ts"
+		]
+	},
+	"devDependencies": {
+		"@earendil-works/pi-coding-agent": "^0.84.3",
+		"@earendil-works/pi-tui": "^0.84.3",
+		"typescript": "^7",
+		"typebox": "^1.3.7"
+	}
+}
