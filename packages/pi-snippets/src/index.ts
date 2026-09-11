@@ -1,30 +1,47 @@
 import { mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
+import { getAgentDir, type ExtensionAPI, type ExtensionContext } from "@earendil-works/pi-coding-agent";
 import { Key, matchesKey, truncateToWidth, wrapTextWithAnsi } from "@earendil-works/pi-tui";
-import { loadSnippets, type Snippet } from "./snippets.js";
+import { InvalidSnippetSettingsError, loadSnippetModes, loadSnippets, saveSnippetModes, type Snippet, type SnippetMode } from "./snippets.js";
 
-const snippetsDirectory = join(dirname(fileURLToPath(import.meta.url)), "..", "snippets");
+const defaultSnippetsDirectory = join(dirname(fileURLToPath(import.meta.url)), "..", "snippets");
 const widgetId = "pi-snippets";
+const firstMessageEntry = "pi-snippets-first-message";
+const modeLabels = { next: "Next message", first: "First message", every: "Every message" };
+const modeCycle = [undefined, "next", "first", "every"] as const;
 
-export default function (pi: ExtensionAPI): void {
+export default function (pi: ExtensionAPI, {
+  snippetsDirectory = defaultSnippetsDirectory,
+  settingsPath = join(getAgentDir(), "snippets.json"),
+} = {}): void {
   let snippets: Snippet[] = [];
-  let enabled = new Set<string>();
+  let modes = new Map<string, SnippetMode>();
+  let firstMessage = false;
 
   const refresh = (): void => {
     snippets = loadSnippets(snippetsDirectory);
-    enabled = new Set([...enabled].filter((id) => snippets.some((snippet) => snippet.id === id)));
+  };
+
+  const describeMode = (id: string, selection = modes): string => {
+    const mode = selection.get(id);
+    return mode === "first" && !firstMessage ? "First message · next session" : mode ? modeLabels[mode] : "Off";
+  };
+
+  const markStarted = (): void => {
+    pi.appendEntry(firstMessageEntry, {});
+    firstMessage = false;
   };
 
   const updateWidget = (ctx: ExtensionContext): void => {
     if (!ctx.hasUI || ctx.mode !== "tui") return;
-    const active = snippets.filter(({ id }) => enabled.has(id));
+    const active = snippets.filter(({ id }) => modes.has(id));
     const before = active.filter(({ placement }) => placement === "before");
     const after = active.filter(({ placement }) => placement === "after");
+    const label = ({ id, name }: Snippet) => `${name} [${describeMode(id)}]`;
     const lines = [
-      ...(before.length ? [ctx.ui.theme.fg("accent", `↑ before: ${before.map(({ name }) => name).join(" · ")}`)] : []),
-      ...(after.length ? [ctx.ui.theme.fg("warning", `↓ after: ${after.map(({ name }) => name).join(" · ")}`)] : []),
+      ...(before.length ? [ctx.ui.theme.fg("accent", `↑ before: ${before.map(label).join(" · ")}`)] : []),
+      ...(after.length ? [ctx.ui.theme.fg("warning", `↓ after: ${after.map(label).join(" · ")}`)] : []),
     ];
     ctx.ui.setWidget(widgetId, lines.length ? lines : undefined);
   };
@@ -42,7 +59,7 @@ export default function (pi: ExtensionAPI): void {
       return;
     }
 
-    const working = new Set(enabled);
+    const working = new Map(modes);
     const confirmed = await ctx.ui.custom<boolean>((tui, theme, _keybindings, done) => {
       const before = snippets.filter(({ placement }) => placement === "before");
       const after = snippets.filter(({ placement }) => placement === "after");
@@ -51,6 +68,9 @@ export default function (pi: ExtensionAPI): void {
       let cursor = 0;
       let listScroll = 0;
       let previewScroll = 0;
+
+      const itemText = (snippet: Snippet, item: number): string =>
+        `${item === cursor ? theme.fg("accent", "> ") : "  "}${theme.fg(working.has(snippet.id) ? "success" : "dim", `[${describeMode(snippet.id, working)}]`)} ${theme.bold(snippet.name)}${snippet.description ? theme.fg("dim", ` — ${snippet.description}`) : ""}`;
 
       const viewport = (lines: string[], scroll: number, maxView: number, focusRow?: number) => {
         const clipped = lines.length > maxView;
@@ -83,30 +103,24 @@ export default function (pi: ExtensionAPI): void {
           if (mode === "list") {
             const rows: Array<{ text: string; item?: number }> = [
               { text: theme.fg("dim", "↑ BEFORE — added before your message") },
-              ...before.map((snippet, item) => ({
-                item,
-                text: `${item === cursor ? theme.fg("accent", "> ") : "  "}${working.has(snippet.id) ? theme.fg("success", "[x]") : theme.fg("dim", "[ ]")} ${theme.bold(snippet.name)}${snippet.description ? theme.fg("dim", ` — ${snippet.description}`) : ""}`,
-              })),
+              ...before.map((snippet, item) => ({ item, text: itemText(snippet, item) })),
               { text: "" },
               { text: theme.fg("dim", "↓ AFTER — added after your message") },
               ...after.map((snippet, index) => {
                 const item = before.length + index;
-                return {
-                  item,
-                  text: `${item === cursor ? theme.fg("accent", "> ") : "  "}${working.has(snippet.id) ? theme.fg("success", "[x]") : theme.fg("dim", "[ ]")} ${theme.bold(snippet.name)}${snippet.description ? theme.fg("dim", ` — ${snippet.description}`) : ""}`,
-                };
+                return { item, text: itemText(snippet, item) };
               }),
             ];
             const view = viewport(rows.map(({ text }) => truncateToWidth(text, width)), listScroll, maxView, rows.findIndex(({ item }) => item === cursor));
             content = view.lines;
             listScroll = view.scroll;
             title = "Prompt snippets";
-            hints = "↑↓ navigate • Space toggle • Tab preview • Enter apply • Esc cancel";
+            hints = "↑↓ navigate • Space cycle mode • Tab preview • Enter apply • Esc cancel";
           } else {
             const snippet = items[cursor];
             const rows = [
               theme.bold(snippet.name),
-              theme.fg("dim", `${snippet.placement} · order ${snippet.order} · ${snippet.id}`),
+              theme.fg("dim", `${describeMode(snippet.id, working)} · ${snippet.placement} · order ${snippet.order} · ${snippet.id}`),
               theme.fg("dim", "─".repeat(Math.min(width, 40))),
               ...snippet.body.split("\n").flatMap((line) => wrapTextWithAnsi(line, width)),
             ].map((line) => truncateToWidth(line, width));
@@ -134,8 +148,9 @@ export default function (pi: ExtensionAPI): void {
             else if (matchesKey(data, Key.down)) cursor = (cursor + 1) % items.length;
             else if (matchesKey(data, Key.space)) {
               const id = items[cursor].id;
-              if (working.has(id)) working.delete(id);
-              else working.add(id);
+              const next = modeCycle[(modeCycle.indexOf(working.get(id)) + 1) % modeCycle.length];
+              if (next) working.set(id, next);
+              else working.delete(id);
             } else if (matchesKey(data, Key.tab)) {
               mode = "preview";
               previewScroll = 0;
@@ -151,28 +166,67 @@ export default function (pi: ExtensionAPI): void {
       };
     });
 
-    if (confirmed) enabled = working;
+    if (confirmed) {
+      try {
+        try {
+          saveSnippetModes(settingsPath, working);
+        } catch (error) {
+          if (!(error instanceof InvalidSnippetSettingsError)) throw error;
+          const reset = await ctx.ui.confirm(
+            "Reset invalid snippet settings?",
+            `${error.message}\nBack up ${settingsPath} and replace it with your current menu selections?`,
+          );
+          if (!reset) {
+            updateWidget(ctx);
+            return;
+          }
+          const backup = saveSnippetModes(settingsPath, working, true);
+          if (backup) ctx.ui.notify(`Previous snippet settings backed up to ${backup}`, "info");
+        }
+        modes = working;
+      } catch (error) {
+        ctx.ui.notify(`Could not save snippet settings: ${error}`, "error");
+      }
+    }
     updateWidget(ctx);
   };
 
-  pi.on("session_start", (_event, ctx) => {
+  pi.on("session_start", (event, ctx) => {
     mkdirSync(snippetsDirectory, { recursive: true });
-    enabled.clear();
+    modes = new Map();
+    try {
+      modes = loadSnippetModes(settingsPath);
+    } catch (error) {
+      ctx.ui.notify(`Could not load snippet settings: ${error}`, "error");
+    }
+    firstMessage = !ctx.sessionManager.getEntries().some((entry) =>
+      (entry.type === "message" && entry.message.role === "user") ||
+      (entry.type === "custom" && entry.customType === firstMessageEntry),
+    );
+    if (firstMessage && (event.reason === "resume" || event.reason === "fork")) markStarted();
     refresh();
     updateWidget(ctx);
   });
 
   pi.on("input", (event, ctx) => {
-    if (!enabled.size) return;
+    if (event.source === "extension") return;
 
+    const isFirstMessage = firstMessage;
+    if (firstMessage) markStarted();
     refresh();
-    const active = snippets.filter(({ id }) => enabled.has(id));
-    enabled.clear();
+    const active = snippets.filter(({ id }) => {
+      const mode = modes.get(id);
+      return mode === "next" || mode === "every" || (mode === "first" && isFirstMessage);
+    });
+    for (const { id } of active) {
+      if (modes.get(id) === "next") modes.delete(id);
+    }
     updateWidget(ctx);
     if (!active.length) return;
 
     return {
       action: "transform",
+      images: event.images,
       text: [
         ...active.filter(({ placement }) => placement === "before").map(({ body }) => body),
         event.text,
@@ -182,12 +236,12 @@ export default function (pi: ExtensionAPI): void {
   });
 
   pi.registerCommand("snippets", {
-    description: "Toggle one-shot prompt snippets",
+    description: "Configure per-snippet application modes",
     handler: async (_args, ctx) => openMenu(ctx),
   });
 
   pi.registerShortcut("ctrl+alt+p", {
-    description: "Toggle prompt snippets",
+    description: "Configure prompt snippets",
     handler: openMenu,
   });
 }
