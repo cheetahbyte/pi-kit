@@ -34,8 +34,13 @@ and ordering remain unchanged.
 
 ## Store snippets and settings
 
-Snippet files live in this package's `snippets/` directory. Each Markdown file
-uses this format:
+Snippet files are Markdown files read from two directories:
+
+- this package's bundled `snippets/` directory
+- `snippets/` in Pi's agent directory (normally `~/.pi/agent/snippets/`)
+
+A file in the agent directory with the same filename replaces the bundled one.
+Each file uses this format:
 
 ```markdown
 ---

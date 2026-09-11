@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { loadSnippetModes, parseSnippet, saveSnippetModes, type SnippetMode } from "./snippets.js";
+import { loadSnippetModes, loadSnippets, parseSnippet, saveSnippetModes, type SnippetMode } from "./snippets.js";
 
 test("persists only automatic modes and refuses to overwrite invalid settings", () => {
   const directory = mkdtempSync(join(tmpdir(), "pi-snippets-"));
@@ -44,4 +44,25 @@ Check this first.
       body: "Check this first.",
     });
   });
+});
+
+test("loadSnippets merges directories, later ones override by filename", () => {
+  const directory = mkdtempSync(join(tmpdir(), "pi-snippets-"));
+  try {
+    const bundled = join(directory, "bundled");
+    const user = join(directory, "user");
+    mkdirSync(bundled);
+    mkdirSync(user);
+    writeFileSync(join(bundled, "a.md"), "---\nname: Bundled A\norder: 1\n---\nbundled");
+    writeFileSync(join(bundled, "b.md"), "---\nname: B\norder: 2\n---\nb");
+    writeFileSync(join(user, "a.md"), "---\nname: User A\norder: 3\n---\nuser");
+    writeFileSync(join(user, "c.md"), "---\nname: C\norder: 0\n---\nc");
+    expect(loadSnippets([bundled, user, join(directory, "missing")]).map(({ id, name, body }) => [id, name, body])).toEqual([
+      ["c.md", "C", "c"],
+      ["b.md", "B", "b"],
+      ["a.md", "User A", "user"],
+    ]);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
 });

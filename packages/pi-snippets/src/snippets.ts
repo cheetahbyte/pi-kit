@@ -83,18 +83,16 @@ export function parseSnippet(id: string, source: string): Snippet | undefined {
   };
 }
 
-export function loadSnippets(directory: string): Snippet[] {
-  if (!existsSync(directory)) return [];
-
-  return readdirSync(directory)
-    .filter((file) => file.endsWith(".md"))
-    .flatMap((file) => {
+export function loadSnippets(directories: string | string[]): Snippet[] {
+  const byId = new Map<string, Snippet>();
+  for (const directory of [directories].flat()) {
+    if (!existsSync(directory)) continue;
+    for (const file of readdirSync(directory).filter((file) => file.endsWith(".md"))) {
       try {
         const snippet = parseSnippet(file, readFileSync(join(directory, file), "utf8"));
-        return snippet ? [snippet] : [];
-      } catch {
-        return [];
-      }
-    })
-    .sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
+        if (snippet) byId.set(file, snippet);
+      } catch {}
+    }
+  }
+  return [...byId.values()].sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
 }

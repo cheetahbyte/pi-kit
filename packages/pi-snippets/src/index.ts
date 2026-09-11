@@ -5,22 +5,23 @@ import { getAgentDir, type ExtensionAPI, type ExtensionContext } from "@earendil
 import { Key, matchesKey, truncateToWidth, wrapTextWithAnsi } from "@earendil-works/pi-tui";
 import { InvalidSnippetSettingsError, loadSnippetModes, loadSnippets, saveSnippetModes, type Snippet, type SnippetMode } from "./snippets.js";
 
-const defaultSnippetsDirectory = join(dirname(fileURLToPath(import.meta.url)), "..", "snippets");
+const bundledSnippetsDirectory = join(dirname(fileURLToPath(import.meta.url)), "..", "snippets");
 const widgetId = "pi-snippets";
 const firstMessageEntry = "pi-snippets-first-message";
 const modeLabels = { next: "Next message", first: "First message", every: "Every message" };
 const modeCycle = [undefined, "next", "first", "every"] as const;
 
 export default function (pi: ExtensionAPI, {
-  snippetsDirectory = defaultSnippetsDirectory,
+  snippetsDirectory = [bundledSnippetsDirectory, join(getAgentDir(), "snippets")] as string | string[],
   settingsPath = join(getAgentDir(), "snippets.json"),
 } = {}): void {
+  const snippetsDirectories = [snippetsDirectory].flat();
   let snippets: Snippet[] = [];
   let modes = new Map<string, SnippetMode>();
   let firstMessage = false;
 
   const refresh = (): void => {
-    snippets = loadSnippets(snippetsDirectory);
+    snippets = loadSnippets(snippetsDirectories);
   };
 
   const describeMode = (id: string, selection = modes): string => {
@@ -54,7 +55,7 @@ export default function (pi: ExtensionAPI, {
 
     refresh();
     if (!snippets.length) {
-      ctx.ui.notify(`No snippets found in ${snippetsDirectory}`, "warning");
+      ctx.ui.notify(`No snippets found in ${snippetsDirectories.join(", ")}`, "warning");
       updateWidget(ctx);
       return;
     }
@@ -192,7 +193,7 @@ export default function (pi: ExtensionAPI, {
   };
 
   pi.on("session_start", (event, ctx) => {
-    mkdirSync(snippetsDirectory, { recursive: true });
+    for (const directory of snippetsDirectories) mkdirSync(directory, { recursive: true });
     modes = new Map();
     try {
       modes = loadSnippetModes(settingsPath);
