@@ -1,4 +1,5 @@
 import { readMetricSeries } from "./metrics.ts";
+import { listResults } from "./runner.ts";
 import type { Outcome, Proposal } from "./proposals.ts";
 import { listSessionFiles, readUserMessages } from "./sessions.ts";
 
@@ -19,10 +20,22 @@ const mean = (xs: number[]): number => (xs.length ? xs.reduce((a, b) => a + b, 0
 
 export function checkProposal(
   p: Proposal,
-  deps: { sessionsDir: string; dbPath: string },
+  deps: { sessionsDir: string; dbPath: string; evalDir: string },
 ): { outcome: Outcome; before: number; after: number; samples: number } {
   const appliedAt = p.appliedAt ?? p.createdAt;
   if (!p.verify) return { outcome: "insufficient-data", before: 0, after: 0, samples: 0 };
+  if (p.verify.kind === "eval") {
+    const latest = listResults(deps.evalDir, { name: p.verify.case, since: appliedAt })[0];
+    if (!latest) return { outcome: "insufficient-data", before: p.verify.baseline ?? 0, after: 0, samples: 0 };
+    const before = p.verify.baseline ?? latest.baselineScore;
+    const runs = latest.arms.with?.length ?? 0;
+    if (before === undefined) {
+      return { outcome: latest.score >= 1 ? "improved" : "worse", before: 0, after: latest.score, samples: runs };
+    }
+    const delta = latest.score - before;
+    const outcome: Outcome = delta >= THRESHOLD ? "improved" : delta <= -THRESHOLD ? "worse" : "unchanged";
+    return { outcome, before, after: latest.score, samples: runs };
+  }
   if (p.verify.kind === "correction") {
     const re = new RegExp(p.verify.pattern, "i");
     const count = (path: string): number => readUserMessages(path).filter((t) => re.test(t)).length;

@@ -1,37 +1,38 @@
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
-import { loadConfig, type HarnessConfig } from "./config.ts";
+import { loadConfig, type EvalConfig } from "./config.ts";
 import { newSignals, recordToolResult, recordUserText, shouldFlag, type SessionSignals } from "./flag.ts";
-import { agentDir, efficiencyDbPath, harnessDir, sessionsDir } from "./paths.ts";
+import { agentDir, efficiencyDbPath, evalDir, sessionsDir } from "./paths.ts";
+import { listCases } from "./cases.ts";
 import { listProposals } from "./proposals.ts";
-import { checkAll, reviewLoop, type Deps } from "./review.ts";
+import { checkAll, reviewLoop, showResults, type Deps } from "./review.ts";
 import { lastWorkerError, spawnWorker } from "./worker.ts";
 
-export default function harnessExtension(pi: ExtensionAPI): void {
-  if (process.env.PI_HARNESS_WORKER === "1") return;
+export default function evalExtension(pi: ExtensionAPI): void {
+  if (process.env.PI_EVAL_WORKER === "1") return;
 
   const deps: Deps = {
     agentDir: agentDir(),
-    harnessDir: harnessDir(),
+    evalDir: evalDir(),
     sessionsDir: sessionsDir(),
     dbPath: efficiencyDbPath(),
   };
-  let cfg: HarnessConfig = loadConfig(deps.harnessDir);
+  let cfg: EvalConfig = loadConfig(deps.evalDir);
   let signals: SessionSignals = newSignals();
   let sessionFile: string | undefined;
   let sessionId = "";
 
   pi.on("session_start", async (_event, ctx) => {
-    cfg = loadConfig(deps.harnessDir);
+    cfg = loadConfig(deps.evalDir);
     signals = newSignals();
     sessionFile = ctx.sessionManager.getSessionFile();
     sessionId = ctx.sessionManager.getSessionId();
     if (!ctx.hasUI) return;
-    const pending = listProposals(deps.harnessDir, "pending").length;
+    const pending = listProposals(deps.evalDir, "pending").length;
     if (pending > 0) {
-      ctx.ui.notify(`harness: ${pending} proposal${pending === 1 ? "" : "s"} pending, run /harness`, "info");
+      ctx.ui.notify(`eval: ${pending} proposal${pending === 1 ? "" : "s"} pending, run /eval`, "info");
     }
     const err = lastWorkerError();
-    if (err) ctx.ui.notify(`harness: last worker failed: ${err.slice(0, 120)}`, "warning");
+    if (err) ctx.ui.notify(`eval: last worker failed: ${err.slice(0, 120)}`, "warning");
   });
 
   pi.on("input", async (event) => {
@@ -54,24 +55,35 @@ export default function harnessExtension(pi: ExtensionAPI): void {
     spawnWorker("retro", [sessionFile, sessionId, r.reasons.join(",")]);
   });
 
-  pi.registerCommand("harness", {
-    description: "Review harness proposals; subcommands: check, audit [n], retro",
+  pi.registerCommand("eval", {
+    description: "Review harness proposals; subcommands: check, audit [n], retro, run [case*], results",
     handler: async (args, ctx) => {
       if (!ctx.hasUI) return;
       const [sub = "", arg] = args.trim().split(/\s+/);
       if (sub === "check") return checkAll(ctx, deps);
       if (sub === "audit") {
         spawnWorker("audit", [String(Number(arg) || cfg.auditSessions)]);
-        ctx.ui.notify("harness: audit started in background", "info");
+        ctx.ui.notify("eval: audit started in background", "info");
         return;
       }
+      if (sub === "run") {
+        const cases = listCases(deps.evalDir, arg);
+        if (!cases.length) {
+          ctx.ui.notify(`eval: no cases${arg ? ` matching ${arg}` : ""} in ${deps.evalDir}/cases`, "warning");
+          return;
+        }
+        spawnWorker("run", arg ? [arg] : []);
+        ctx.ui.notify(`eval: running ${cases.length} case(s) in background, see /eval results`, "info");
+        return;
+      }
+      if (sub === "results") return showResults(ctx, deps);
       if (sub === "retro") {
         if (!sessionFile) {
-          ctx.ui.notify("harness: no session file", "warning");
+          ctx.ui.notify("eval: no session file", "warning");
           return;
         }
         spawnWorker("retro", [sessionFile, sessionId, "manual"]);
-        ctx.ui.notify("harness: retrospective started in background", "info");
+        ctx.ui.notify("eval: retrospective started in background", "info");
         return;
       }
       await reviewLoop(ctx, deps, () => spawnWorker("audit", [String(cfg.auditSessions)]));

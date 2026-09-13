@@ -6,12 +6,12 @@ import { DEFAULT_CONFIG, loadConfig } from "./config.ts";
 
 describe("loadConfig", () => {
   test("returns defaults when file is missing", () => {
-    const dir = mkdtempSync(join(tmpdir(), "harness-"));
+    const dir = mkdtempSync(join(tmpdir(), "eval-"));
     expect(loadConfig(dir)).toEqual(DEFAULT_CONFIG);
   });
 
   test("merges valid overrides and ignores invalid ones", () => {
-    const dir = mkdtempSync(join(tmpdir(), "harness-"));
+    const dir = mkdtempSync(join(tmpdir(), "eval-"));
     writeFileSync(
       join(dir, "config.json"),
       JSON.stringify({
@@ -29,7 +29,7 @@ describe("loadConfig", () => {
   });
 
   test("returns defaults on malformed json", () => {
-    const dir = mkdtempSync(join(tmpdir(), "harness-"));
+    const dir = mkdtempSync(join(tmpdir(), "eval-"));
     writeFileSync(join(dir, "config.json"), "{nope");
     expect(loadConfig(dir)).toEqual(DEFAULT_CONFIG);
   });

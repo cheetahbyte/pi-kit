@@ -1,4 +1,4 @@
-import type { HarnessConfig } from "./config.ts";
+import type { EvalConfig } from "./config.ts";
 
 export interface SessionSignals {
   userMessages: number;
@@ -29,7 +29,7 @@ export function recordToolResult(s: SessionSignals, toolName: string, isError: b
   s.errorKeys.set(key, (s.errorKeys.get(key) ?? 0) + 1);
 }
 
-export function shouldFlag(s: SessionSignals, cfg: HarnessConfig): { flagged: boolean; reasons: string[] } {
+export function shouldFlag(s: SessionSignals, cfg: EvalConfig): { flagged: boolean; reasons: string[] } {
   if (s.userMessages < cfg.minUserMessages) return { flagged: false, reasons: [] };
   const reasons: string[] = [];
   if (s.corrections >= 1) reasons.push(`corrections=${s.corrections}`);

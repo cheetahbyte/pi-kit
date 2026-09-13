@@ -49,10 +49,53 @@ describe("checkProposal correction", () => {
       status: "accepted",
       appliedAt: Date.parse("2026-09-01T00:00:00Z"),
     };
-    const r = checkProposal(p, { sessionsDir: dir, dbPath: join(dir, "none.db") });
+    const r = checkProposal(p, { sessionsDir: dir, dbPath: join(dir, "none.db"), evalDir: join(dir, "eval") });
     expect(r.samples).toBe(10);
     expect(r.before).toBe(1);
     expect(r.after).toBe(0);
     expect(r.outcome).toBe("improved");
+  });
+});
+
+describe("checkProposal eval", () => {
+  const base = (verify: Proposal["verify"]): Proposal => ({
+    id: "e",
+    createdAt: 0,
+    source: "retro",
+    sessionIds: [],
+    kind: "eval-case",
+    title: "t",
+    rationale: "",
+    evidence: [],
+    change: { type: "note", text: "" },
+    verify,
+    status: "accepted",
+    appliedAt: 1000,
+  });
+  const deps = (evalDir: string) => ({ sessionsDir: join(evalDir, "none"), dbPath: join(evalDir, "none.db"), evalDir });
+  const result = (createdAt: number, score: number, baselineScore?: number) =>
+    JSON.stringify({ name: "c", createdAt, model: "m", score, baselineScore, arms: { with: [{}, {}] } });
+
+  test("no run after apply means insufficient data", () => {
+    const evalDir = mkdtempSync(join(tmpdir(), "veval-"));
+    mkdirSync(join(evalDir, "results", "old"), { recursive: true });
+    writeFileSync(join(evalDir, "results", "old", "c.json"), result(500, 1));
+    expect(checkProposal(base({ kind: "eval", case: "c" }), deps(evalDir)).outcome).toBe("insufficient-data");
+  });
+
+  test("without baseline a full score is improved, anything else worse", () => {
+    const evalDir = mkdtempSync(join(tmpdir(), "veval-"));
+    mkdirSync(join(evalDir, "results", "new"), { recursive: true });
+    writeFileSync(join(evalDir, "results", "new", "c.json"), result(2000, 0.5));
+    const r = checkProposal(base({ kind: "eval", case: "c" }), deps(evalDir));
+    expect(r).toMatchObject({ outcome: "worse", after: 0.5, samples: 2 });
+  });
+
+  test("with a baseline the delta decides", () => {
+    const evalDir = mkdtempSync(join(tmpdir(), "veval-"));
+    mkdirSync(join(evalDir, "results", "new"), { recursive: true });
+    writeFileSync(join(evalDir, "results", "new", "c.json"), result(2000, 1, 0.5));
+    expect(checkProposal(base({ kind: "eval", case: "c" }), deps(evalDir)).outcome).toBe("improved");
+    expect(checkProposal(base({ kind: "eval", case: "c", baseline: 0.9 }), deps(evalDir)).outcome).toBe("unchanged");
   });
 });

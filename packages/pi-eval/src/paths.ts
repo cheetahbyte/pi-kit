@@ -5,8 +5,8 @@ export function agentDir(): string {
   return process.env.PI_CODING_AGENT_DIR ?? join(homedir(), ".pi", "agent");
 }
 
-export function harnessDir(): string {
-  return join(agentDir(), "harness");
+export function evalDir(): string {
+  return join(agentDir(), "eval");
 }
 
 export function sessionsDir(): string {

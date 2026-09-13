@@ -19,10 +19,10 @@ describe("prompts", () => {
 
   test("audit prompt renders a table row per session", () => {
     const p = buildAuditPrompt({
-      rows: [{ id: "a", date: "2026-09-01", cwd: "/x", corrections: ["no, wrong"], metrics: { toolCalls: 3 } }],
+      rows: [{ id: "a", date: "2026-09-01", cwd: "/x", model: "p/m", corrections: ["no, wrong"], metrics: { toolCalls: 3 } }],
       snapshot: "snap",
     });
-    expect(p).toContain("| a | 2026-09-01 | /x | 1 | 3 |");
+    expect(p).toContain("| a | 2026-09-01 | /x | p/m | 1 | 3 |");
     expect(p).toContain("no, wrong");
     expect(p).toContain("snap");
   });

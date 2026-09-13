@@ -20,8 +20,8 @@
         "@earendil-works/pi-coding-agent": "*",
       },
     },
-    "packages/pi-harness": {
-      "name": "@cheetahbyte/pi-harness",
+    "packages/pi-eval": {
+      "name": "@cheetahbyte/pi-eval",
       "version": "0.1.0",
       "devDependencies": {
         "@earendil-works/pi-coding-agent": "^0.84.3",
@@ -125,7 +125,7 @@
 
     "@cheetahbyte/pi-agent-efficiency": ["@cheetahbyte/pi-agent-efficiency@workspace:packages/pi-agent-efficiency"],
 
-    "@cheetahbyte/pi-harness": ["@cheetahbyte/pi-harness@workspace:packages/pi-harness"],
+    "@cheetahbyte/pi-eval": ["@cheetahbyte/pi-eval@workspace:packages/pi-eval"],
 
     "@cheetahbyte/pi-header": ["@cheetahbyte/pi-header@workspace:packages/pi-header"],
 

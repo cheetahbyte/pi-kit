@@ -141,3 +141,30 @@ describe("applyChange", () => {
     expect(applyChange(dir, { type: "create", path: "skills/../auth.json", content: "" }).ok).toBe(false);
   });
 });
+
+describe("eval cases", () => {
+  test("accepts eval verify and an eval-case create under eval/cases", () => {
+    const raw = JSON.stringify([
+      {
+        kind: "eval-case",
+        title: "Regression: no commit without ask",
+        rationale: "r",
+        evidence: [],
+        change: { type: "create", path: "eval/cases/no-commit/prompt.md", content: "---\nruns: 1\n---\nFix it." },
+        verify: { kind: "eval", case: "no-commit" },
+      },
+      { ...valid, title: "Bad case name", verify: { kind: "eval", case: "../x" } },
+    ]);
+    const ps = parseProposals(raw, ctx);
+    expect(ps).toHaveLength(2);
+    expect(ps[0].verify).toEqual({ kind: "eval", case: "no-commit", baseline: undefined });
+    expect(ps[1].verify).toBeUndefined();
+  });
+
+  test("applyChange creates the case file inside the agent dir", () => {
+    const agent = mkdtempSync(join(tmpdir(), "agent-"));
+    const r = applyChange(agent, { type: "create", path: "eval/cases/no-commit/prompt.md", content: "Fix it." });
+    expect(r.ok).toBe(true);
+    expect(readFileSync(join(agent, "eval", "cases", "no-commit", "prompt.md"), "utf8")).toBe("Fix it.");
+  });
+});

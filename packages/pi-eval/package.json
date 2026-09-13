@@ -1,5 +1,5 @@
 {
-  "name": "@cheetahbyte/pi-harness",
+  "name": "@cheetahbyte/pi-eval",
   "version": "0.1.0",
   "private": true,
   "type": "module",

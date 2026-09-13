@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, readdirSync, unlinkSync, writeFileSync } from "node:fs";
 import { dirname, join, normalize } from "node:path";
 
-export type ProposalKind = "agents-rule" | "skill-edit" | "skill-new" | "prompt-edit" | "setting" | "extension-issue" | "prune";
+export type ProposalKind = "agents-rule" | "skill-edit" | "skill-new" | "prompt-edit" | "setting" | "extension-issue" | "prune" | "eval-case";
 export type SettingKey = "defaultModel" | "defaultThinkingLevel";
 
 export type Change =
@@ -14,7 +14,8 @@ export type Change =
 
 export type Verify =
   | { kind: "correction"; pattern: string }
-  | { kind: "metric"; metric: string; direction: "down" | "up"; baseline: number };
+  | { kind: "metric"; metric: string; direction: "down" | "up"; baseline: number }
+  | { kind: "eval"; case: string; baseline?: number };
 
 export type Outcome = "improved" | "unchanged" | "worse" | "insufficient-data";
 export type Status = "pending" | "accepted" | "rejected";
@@ -36,7 +37,7 @@ export interface Proposal {
   outcome?: Outcome;
 }
 
-const KINDS = new Set<string>(["agents-rule", "skill-edit", "skill-new", "prompt-edit", "setting", "extension-issue", "prune"]);
+const KINDS = new Set<string>(["agents-rule", "skill-edit", "skill-new", "prompt-edit", "setting", "extension-issue", "prune", "eval-case"]);
 const SETTING_KEYS = new Set<string>(["defaultModel", "defaultThinkingLevel"]);
 const MAX_PROPOSALS = 5;
 
@@ -44,7 +45,7 @@ export function allowedPath(path: string): boolean {
   if (typeof path !== "string" || !path || path.includes("\0")) return false;
   const n = normalize(path).replaceAll("\\", "/");
   if (n.startsWith("/") || n.startsWith("..") || n.includes("/../")) return false;
-  return n === "AGENTS.md" || n.startsWith("skills/") || n.startsWith("prompts/");
+  return n === "AGENTS.md" || n.startsWith("skills/") || n.startsWith("prompts/") || n.startsWith("eval/cases/");
 }
 
 function validChange(c: unknown): Change | undefined {
@@ -98,6 +99,9 @@ function validVerify(v: unknown): Verify | undefined {
     typeof o.baseline === "number"
   ) {
     return { kind: "metric", metric: o.metric, direction: o.direction, baseline: o.baseline };
+  }
+  if (o.kind === "eval" && typeof o.case === "string" && /^[\w.-]+$/.test(o.case)) {
+    return { kind: "eval", case: o.case, baseline: typeof o.baseline === "number" ? o.baseline : undefined };
   }
   return undefined;
 }
@@ -168,14 +172,14 @@ export function parseProposals(
 
 const DIRS: Record<Status, string> = { pending: "proposals", accepted: "applied", rejected: "rejected" };
 
-function dirFor(harnessDir: string, status: Status): string {
-  const d = join(harnessDir, DIRS[status]);
+function dirFor(evalDir: string, status: Status): string {
+  const d = join(evalDir, DIRS[status]);
   mkdirSync(d, { recursive: true });
   return d;
 }
 
-export function listProposals(harnessDir: string, status: Status): Proposal[] {
-  const d = dirFor(harnessDir, status);
+export function listProposals(evalDir: string, status: Status): Proposal[] {
+  const d = dirFor(evalDir, status);
   return readdirSync(d)
     .filter((f) => f.endsWith(".json"))
     .sort()
@@ -188,22 +192,22 @@ export function listProposals(harnessDir: string, status: Status): Proposal[] {
     });
 }
 
-export function readProposal(harnessDir: string, status: Status, id: string): Proposal | undefined {
-  const file = join(dirFor(harnessDir, status), `${id}.json`);
+export function readProposal(evalDir: string, status: Status, id: string): Proposal | undefined {
+  const file = join(dirFor(evalDir, status), `${id}.json`);
   if (!existsSync(file)) return undefined;
   return JSON.parse(readFileSync(file, "utf8")) as Proposal;
 }
 
-export function writeProposal(harnessDir: string, p: Proposal): string {
-  const file = join(dirFor(harnessDir, p.status), `${p.id}.json`);
+export function writeProposal(evalDir: string, p: Proposal): string {
+  const file = join(dirFor(evalDir, p.status), `${p.id}.json`);
   writeFileSync(file, JSON.stringify(p, null, 2) + "\n");
   return file;
 }
 
-export function moveProposal(harnessDir: string, p: Proposal, to: "accepted" | "rejected"): void {
-  const from = join(dirFor(harnessDir, p.status), `${p.id}.json`);
+export function moveProposal(evalDir: string, p: Proposal, to: "accepted" | "rejected"): void {
+  const from = join(dirFor(evalDir, p.status), `${p.id}.json`);
   const next: Proposal = { ...p, status: to, appliedAt: to === "accepted" ? Date.now() : undefined };
-  writeProposal(harnessDir, next);
+  writeProposal(evalDir, next);
   if (p.status !== to && existsSync(from)) unlinkSync(from);
 }
 

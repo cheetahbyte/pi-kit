@@ -25,3 +25,16 @@ describe("sessions", () => {
     expect(readUserMessages(since[0].path)).toEqual(["two", "no, wrong"]);
   });
 });
+
+describe("session model", () => {
+  test("reads provider/model from the first model_change entry", () => {
+    const dir = mkdtempSync(join(tmpdir(), "sess-"));
+    mkdirSync(join(dir, "--m--"));
+    const lines = [
+      JSON.stringify({ type: "session", version: 3, id: "9", timestamp: "2026-09-01T10:00:00.000Z", cwd: "/m" }),
+      JSON.stringify({ type: "model_change", provider: "openai-codex", modelId: "gpt-6-astra" }),
+    ];
+    writeFileSync(join(dir, "--m--", "s.jsonl"), lines.join("\n") + "\n");
+    expect(listSessionFiles(dir)[0].model).toBe("openai-codex/gpt-6-astra");
+  });
+});

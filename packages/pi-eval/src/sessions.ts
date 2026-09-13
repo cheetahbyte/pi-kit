@@ -7,16 +7,27 @@ export interface SessionFile {
   id: string;
   startedAt: number;
   cwd: string;
+  model?: string;
 }
 
 function headerOf(path: string): SessionFile | undefined {
   try {
-    const text = readFileSync(path, "utf8");
-    const nl = text.indexOf("\n");
-    const first = text.slice(0, nl < 0 ? text.length : nl);
-    const h = JSON.parse(first) as { type?: string; id?: string; timestamp?: string; cwd?: string };
+    const lines = readFileSync(path, "utf8").split("\n", 6);
+    const h = JSON.parse(lines[0] ?? "") as { type?: string; id?: string; timestamp?: string; cwd?: string };
     if (h.type !== "session" || !h.id || !h.timestamp) return undefined;
-    return { path, id: h.id, startedAt: Date.parse(h.timestamp), cwd: h.cwd ?? "" };
+    let model: string | undefined;
+    for (const l of lines.slice(1)) {
+      try {
+        const e = JSON.parse(l) as { type?: string; provider?: string; modelId?: string };
+        if (e.type === "model_change" && e.modelId) {
+          model = e.provider ? `${e.provider}/${e.modelId}` : e.modelId;
+          break;
+        }
+      } catch {
+        continue;
+      }
+    }
+    return { path, id: h.id, startedAt: Date.parse(h.timestamp), cwd: h.cwd ?? "", model };
   } catch {
     return undefined;
   }

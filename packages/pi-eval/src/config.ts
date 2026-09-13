@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
-export interface HarnessConfig {
+export interface EvalConfig {
   model: string;
   thinking: "off" | "minimal" | "low" | "medium" | "high" | "xhigh" | "max";
   auto: boolean;
@@ -10,9 +10,11 @@ export interface HarnessConfig {
   correctionPatterns: string[];
   errorRateThreshold: number;
   auditSessions: number;
+  evalModel?: string;
+  judgeModel?: string;
 }
 
-export const DEFAULT_CONFIG: HarnessConfig = {
+export const DEFAULT_CONFIG: EvalConfig = {
   model: "openai-codex/gpt-5.6-luna",
   thinking: "medium",
   auto: true,
@@ -39,7 +41,7 @@ function safeRegex(pattern: string): boolean {
   }
 }
 
-export function loadConfig(dir: string): HarnessConfig {
+export function loadConfig(dir: string): EvalConfig {
   const file = join(dir, "config.json");
   if (!existsSync(file)) return { ...DEFAULT_CONFIG };
   let raw: Record<string, unknown>;
@@ -58,7 +60,7 @@ export function loadConfig(dir: string): HarnessConfig {
       : DEFAULT_CONFIG.correctionPatterns;
   const thinking =
     typeof raw.thinking === "string" && THINKING.has(raw.thinking)
-      ? (raw.thinking as HarnessConfig["thinking"])
+      ? (raw.thinking as EvalConfig["thinking"])
       : DEFAULT_CONFIG.thinking;
   return {
     model: str(raw.model, DEFAULT_CONFIG.model),
@@ -69,5 +71,7 @@ export function loadConfig(dir: string): HarnessConfig {
     correctionPatterns: patterns,
     errorRateThreshold: num(raw.errorRateThreshold, DEFAULT_CONFIG.errorRateThreshold),
     auditSessions: num(raw.auditSessions, DEFAULT_CONFIG.auditSessions),
+    evalModel: typeof raw.evalModel === "string" && raw.evalModel ? raw.evalModel : undefined,
+    judgeModel: typeof raw.judgeModel === "string" && raw.judgeModel ? raw.judgeModel : undefined,
   };
 }
