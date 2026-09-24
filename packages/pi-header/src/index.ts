@@ -1,6 +1,10 @@
-import { basename, extname } from "node:path";
+import { basename, extname, relative, sep } from "node:path";
+import { homedir } from "node:os";
 import { VERSION, type ExtensionAPI, type SourceInfo } from "@earendil-works/pi-coding-agent";
+import { installAgentSessionResourceCapture, loadedContextPaths } from "./context.js";
 import { truncateToWidth, visibleWidth } from "@earendil-works/pi-tui";
+
+installAgentSessionResourceCapture();
 
 const LOGO = [
   "████████████",
@@ -44,6 +48,16 @@ function row(
   });
 }
 
+function contextPath(path: string, cwd: string): string {
+  const projectRelative = relative(cwd, path);
+  if (projectRelative && projectRelative !== ".." && !projectRelative.startsWith(`..${sep}`)) return projectRelative;
+
+  const homeRelative = relative(homedir(), path);
+  if (homeRelative && homeRelative !== ".." && !homeRelative.startsWith(`..${sep}`)) return `~${sep}${homeRelative}`;
+
+  return path;
+}
+
 function extensionName({ path, source }: SourceInfo): string {
   if (source !== "local") return source;
   const name = basename(path);
@@ -51,6 +65,8 @@ function extensionName({ path, source }: SourceInfo): string {
 }
 
 export default function (pi: ExtensionAPI) {
+  let context: string[] = [];
+
   pi.on("session_start", (_event, ctx) => {
     if (ctx.mode !== "tui") return;
 
@@ -64,8 +80,9 @@ export default function (pi: ExtensionAPI) {
         .filter(({ sourceInfo }) => !["builtin", "sdk"].includes(sourceInfo.source))
         .map(({ sourceInfo }) => extensionName(sourceInfo)),
     ])].sort();
-    const context = [ctx.cwd.split("/").pop() || ctx.cwd];
+    context = loadedContextPaths(ctx.sessionManager);
 
+    const directory = ctx.cwd.split("/").pop() || ctx.cwd;
     ctx.ui.setHeader((_tui, theme) => ({
       render(width: number): string[] {
         const logo = LOGO.map((line) => center(theme.bold(line), width));
@@ -76,7 +93,7 @@ export default function (pi: ExtensionAPI) {
           ...logo.map((line) => theme.fg("text", line)),
           theme.fg("dim", version),
           "",
-          ...row("Context", context, width, (text) => theme.fg("dim", text), (text) => theme.fg("text", text)),
+          ...row("Context", context.length > 0 ? [directory, ...context.map((path) => contextPath(path, ctx.cwd))] : [directory], width, (text) => theme.fg("dim", text), (text) => theme.fg("text", text)),
           ...row("Prompts", prompts, width, (text) => theme.fg("dim", text), (text) => theme.fg("text", text)),
           ...row("Skills", skills, width, (text) => theme.fg("dim", text), (text) => theme.fg("text", text)),
           ...row("Extensions", extensions, width, (text) => theme.fg("dim", text), (text) => theme.fg("text", text)),
@@ -85,6 +102,12 @@ export default function (pi: ExtensionAPI) {
       },
       invalidate() {},
     }));
+  });
+
+  pi.on("before_agent_start", (_event, ctx) => {
+    if (ctx.mode !== "tui") return;
+
+    context = loadedContextPaths(ctx.sessionManager);
   });
 
   pi.registerCommand("builtin-header", {
