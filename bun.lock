@@ -20,6 +20,21 @@
         "@earendil-works/pi-coding-agent": "*",
       },
     },
+    "packages/pi-ask-user-question": {
+      "name": "@cheetahbyte/pi-ask-user-question",
+      "devDependencies": {
+        "@earendil-works/pi-coding-agent": "^0.86.0",
+        "@earendil-works/pi-tui": "^0.86.0",
+        "@types/bun": "^1",
+        "typebox": "^1",
+        "typescript": "^7",
+      },
+      "peerDependencies": {
+        "@earendil-works/pi-coding-agent": "*",
+        "@earendil-works/pi-tui": "*",
+        "typebox": "*",
+      },
+    },
     "packages/pi-eval": {
       "name": "@cheetahbyte/pi-eval",
       "version": "0.1.0",
@@ -116,6 +131,8 @@
     "@cheetahbyte/pi-agent-efficiency": ["@cheetahbyte/pi-agent-efficiency@workspace:packages/pi-agent-efficiency"],
 
     "@cheetahbyte/pi-eval": ["@cheetahbyte/pi-eval@workspace:packages/pi-eval"],
+
+    "@cheetahbyte/pi-ask-user-question": ["@cheetahbyte/pi-ask-user-question@workspace:packages/pi-ask-user-question"],
 
     "@cheetahbyte/pi-header": ["@cheetahbyte/pi-header@workspace:packages/pi-header"],
 
@@ -222,6 +239,8 @@
     "@smithy/types": ["@smithy/types@4.18.0", "", { "dependencies": { "tslib": "^2.6.2" } }, "sha512-CgB6HHWer/vrKps24ulRIbpcpb7K4xAU7SkZ7YHzBPlwHsvsrCJFEXK421s+cJzX+ZrqtA/TuU5w1HzI7k9N8A=="],
 
     "@stablelib/base64": ["@stablelib/base64@1.0.1", "", {}, "sha512-1bnPQqSxSuc3Ii6MhBysoWCg58j97aUjuCSZrGSmDxNqtytIi0k8utUenAwTZN4V5mXXYGsVUI9zeBqy+jBOSQ=="],
+
+    "@types/bun": ["@types/bun@1.4.2", "", { "dependencies": { "bun-types": "1.4.2" } }, "sha512-GimotNn7+ZV0uVArItBbriZsR1oNf0+WTzPkdcFrzShI7k2norL0uzEaJT8T33dWr7O/c9ZDuAFQrctKCi72oQ=="],
 
     "@types/node": ["@types/node@22.20.1", "", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-EANqOCF9QFyra+4pfxUcX9STKJpCLjMbObVzljIJomAWSnuSIEAvyzEU53GaajbXJEgdh0iEcPL+DGvpUd4k1Q=="],
 
