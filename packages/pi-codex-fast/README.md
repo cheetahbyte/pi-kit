@@ -34,6 +34,9 @@ Switching to an incompatible model leaves the preference enabled but shows `Fast
 
 Add a **Pi Event Value** widget in pi-footer and set **Widget ID** to `codex-fast`.
 Enable **Hide when empty** to hide the widget when fast mode is off.
+Hide the `pi-codex-fast` entry in pi-footer's extension status row to avoid a duplicate native indicator.
+In `pi-footer.json`, this means adding `pi-codex-fast` to `extensionStatusRow.hiddenKeys`.
+Publishing events does not automatically add a widget to your footer configuration.
 
 The widget displays `Fast: on` or `Fast: inactive`, matching the native status.
 The extension republishes its value after session changes, reload, model selection, and mode changes, and clears it on shutdown.
