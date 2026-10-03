@@ -43,17 +43,11 @@ Choose one integration to avoid duplicate indicators. The extension requires no 
 
 ## Compatibility and usage
 
-The extension supports the `openai-codex` provider using `openai-codex-responses` with these model IDs:
+The extension allows all models on the `openai-codex` provider using `openai-codex-responses`, without filtering model names.
+Other providers, API-key providers, and virtual model selections are not supported.
 
-- `gpt-5.5`
-- `gpt-5.6`
-- `gpt-6-luna`
-- `gpt-6-sol`
-- `gpt-6-astra`
-- `gpt-6.1-sol`
-
-This explicit list follows OpenAI's [Codex speed documentation](https://developers.openai.com/codex/speed/).
-Unknown models, API-key providers, and virtual model selections are not supported.
+The provider check permits a priority request; it does not verify server-side eligibility.
+OpenAI may reject or ignore priority for individual models. See the [Codex speed documentation](https://developers.openai.com/codex/speed/) for availability.
 
 Fast mode sends `service_tier: "priority"`, matching the
 [Codex request mapping](https://github.com/openai/codex/blob/main/codex-rs/protocol/src/config_types.rs).

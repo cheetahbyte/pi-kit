@@ -1,14 +1,6 @@
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 
 const stateType = "pi-codex-fast";
-const supportedModels = new Set([
-  "gpt-5.5",
-  "gpt-5.6",
-  "gpt-6-luna",
-  "gpt-6-sol",
-  "gpt-6-astra",
-  "gpt-6.1-sol",
-]);
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -16,8 +8,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function isCompatible(ctx: ExtensionContext): boolean {
   return ctx.model?.provider === "openai-codex"
-    && ctx.model.api === "openai-codex-responses"
-    && supportedModels.has(ctx.model.id);
+    && ctx.model.api === "openai-codex-responses";
 }
 
 export default function (pi: ExtensionAPI): void {

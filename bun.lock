@@ -49,6 +49,16 @@
         "@earendil-works/pi-coding-agent": "*",
       },
     },
+    "packages/pi-codex-fast": {
+      "name": "@cheetahbyte/pi-codex-fast",
+      "devDependencies": {
+        "@earendil-works/pi-coding-agent": "^0.86.0",
+        "typescript": "^7",
+      },
+      "peerDependencies": {
+        "@earendil-works/pi-coding-agent": "*",
+      },
+    },
     "packages/pi-header": {
       "name": "@cheetahbyte/pi-header",
       "devDependencies": {
@@ -133,6 +143,8 @@
     "@cheetahbyte/pi-eval": ["@cheetahbyte/pi-eval@workspace:packages/pi-eval"],
 
     "@cheetahbyte/pi-ask-user-question": ["@cheetahbyte/pi-ask-user-question@workspace:packages/pi-ask-user-question"],
+
+    "@cheetahbyte/pi-codex-fast": ["@cheetahbyte/pi-codex-fast@workspace:packages/pi-codex-fast"],
 
     "@cheetahbyte/pi-header": ["@cheetahbyte/pi-header@workspace:packages/pi-header"],
 
