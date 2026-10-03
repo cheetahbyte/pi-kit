@@ -1,3 +1,4 @@
+import { calculateCost } from "@earendil-works/pi-ai";
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 
 const stateType = "pi-codex-fast";
@@ -13,6 +14,7 @@ function isCompatible(ctx: ExtensionContext): boolean {
 
 export default function (pi: ExtensionAPI): void {
   let enabled = false;
+  let requestModel: ExtensionContext["model"];
 
   const status = (ctx: ExtensionContext): string =>
     !enabled ? "Fast mode off"
@@ -28,6 +30,7 @@ export default function (pi: ExtensionAPI): void {
   };
 
   const restore = (ctx: ExtensionContext): void => {
+    requestModel = undefined;
     enabled = false;
     for (const entry of ctx.sessionManager.getBranch()) {
       if (entry.type === "custom" && entry.customType === stateType
@@ -47,9 +50,31 @@ export default function (pi: ExtensionAPI): void {
   });
 
   pi.on("before_provider_request", (event, ctx) => {
+    requestModel = undefined;
     if (!enabled || !isCompatible(ctx) || !isRecord(event.payload)) return;
     if (event.payload.model !== ctx.model?.id) return;
+    requestModel = structuredClone(ctx.model);
     return { ...event.payload, service_tier: "priority" };
+  });
+
+  pi.on("message_end", ({ message }) => {
+    const model = requestModel;
+    if (!model || message.role !== "assistant"
+      || message.provider !== model.provider || message.api !== model.api
+      || message.model !== model.id) return;
+    requestModel = undefined;
+    const usage = { ...message.usage, cost: { ...message.usage.cost } };
+    calculateCost(model, usage);
+    usage.cost.input *= 2;
+    usage.cost.output *= 2;
+    usage.cost.cacheRead *= 2;
+    usage.cost.cacheWrite *= 2;
+    usage.cost.total = usage.cost.input + usage.cost.output + usage.cost.cacheRead + usage.cost.cacheWrite;
+    return { message: { ...message, usage } };
+  });
+
+  pi.on("agent_end", () => {
+    requestModel = undefined;
   });
 
   pi.registerCommand("fast", {

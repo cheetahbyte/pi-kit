@@ -57,7 +57,22 @@ Disabled mode leaves the payload unchanged, including tiers configured elsewhere
 OpenAI currently lists 2.5× included subscription usage and 2× purchased-credit or Enterprise pay-as-you-go rates for Fast mode.
 Availability depends on your plan, workspace, and rollout. A priority request does not guarantee priority service or a particular speed.
 The footer reports the requested mode, not the tier delivered by OpenAI.
-This extension does not adjust Pi's cost estimates or enable Ultrafast.
+This extension does not enable Ultrafast.
+
+## Cost estimates
+
+For each fast-mode request, the extension records the model's base pricing at request time.
+When its assistant message finishes, it recalculates input, output, cache-read, and cache-write costs from Pi's token counts and multiplies them by 2.
+This replaces any provider-calculated multiplier rather than stacking on it.
+
+The adjusted costs are saved with the message and used by Pi's session totals and pi-footer's cost widget.
+Turning fast mode off or switching models during a request does not change that request's estimate.
+Standard requests and existing session history are left unchanged.
+
+These are monetary estimates for requested Fast mode, not confirmed charges or subscription-limit accounting.
+The 2.5× included-usage multiplier is not applied to dollar costs.
+Custom or zero registry prices remain the basis of the estimate.
+If OpenAI ignores priority, or another extension overrides the request tier, the estimate can differ from actual billing.
 
 ## Verify changes
 
