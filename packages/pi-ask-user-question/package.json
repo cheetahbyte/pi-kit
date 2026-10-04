@@ -1,9 +1,30 @@
 {
   "name": "@cheetahbyte/pi-ask-user-question",
-  "private": true,
+  "version": "0.3.0",
+  "description": "Pi extension that registers ask_user_question for structured multiple-choice questions.",
   "type": "module",
   "license": "MIT",
-  "pi": { "extensions": ["./src/index.ts"] },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cheetahbyte/pi-kit.git",
+    "directory": "packages/pi-ask-user-question"
+  },
+  "keywords": [
+    "pi-package",
+    "pi-extension"
+  ],
+  "files": [
+    "src",
+    "!src/**/*.test.ts"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "pi": {
+    "extensions": [
+      "./src/index.ts"
+    ]
+  },
   "scripts": {
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "bun test src"
@@ -14,8 +35,8 @@
     "typebox": "*"
   },
   "devDependencies": {
-    "@earendil-works/pi-coding-agent": "^0.86.0",
-    "@earendil-works/pi-tui": "^0.86.0",
+    "@earendil-works/pi-coding-agent": "^1.0.2",
+    "@earendil-works/pi-tui": "^1.0.2",
     "@types/bun": "^1",
     "typebox": "^1",
     "typescript": "^7"

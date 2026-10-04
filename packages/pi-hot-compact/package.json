@@ -1,0 +1,52 @@
+{
+  "name": "pi-hot-compact",
+  "version": "0.3.0",
+  "description": "Hot compaction and context compiler for the pi coding agent: background compaction over an immutable event log, atomic context swap, recall of omitted history",
+  "license": "MIT",
+  "type": "module",
+  "main": "index.ts",
+  "files": [
+    "index.ts",
+    "src/"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cheetahbyte/pi-kit.git",
+    "directory": "packages/pi-hot-compact"
+  },
+  "homepage": "https://github.com/cheetahbyte/pi-kit/tree/main/packages/pi-hot-compact#readme",
+  "bugs": {
+    "url": "https://github.com/cheetahbyte/pi-kit/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "keywords": [
+    "pi-package",
+    "pi-extension",
+    "compaction",
+    "context"
+  ],
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "bun x tsc --noEmit",
+    "prepublishOnly": "bun test && bun run typecheck"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*",
+    "typebox": "*"
+  },
+  "devDependencies": {
+    "@earendil-works/pi-coding-agent": "^1.0.2",
+    "@types/bun": "^1",
+    "@types/node": "^22",
+    "typebox": "^1",
+    "typescript": "^7"
+  },
+  "pi": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}

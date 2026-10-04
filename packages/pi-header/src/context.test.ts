@@ -14,6 +14,7 @@ type FakeSession = {
     setUIContext: () => void;
     bindCommandContext: () => void;
     onError: () => () => void;
+    reportUnhandledMcpServers: () => void;
     emit: () => Promise<void>;
   };
   _extensionUIContext: object;
@@ -49,6 +50,7 @@ function fakeSession(resourceLoader: ResourceLoader): FakeSession {
       setUIContext: () => {},
       bindCommandContext: () => {},
       onError: () => () => {},
+      reportUnhandledMcpServers: () => {},
       emit: async () => {},
     },
     _extensionUIContext: {},

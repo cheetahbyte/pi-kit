@@ -1,20 +1,62 @@
 {
-  "name": "pi-kit",
+  "name": "@cheetahbyte/pi-kit",
+  "version": "0.3.0",
+  "description": "A batteries-included set of Pi extensions: subagents, hot compaction, todo, hooks, stats, footer, header, and more.",
   "license": "MIT",
-  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cheetahbyte/pi-kit.git"
+  },
+  "keywords": [
+    "pi-package",
+    "pi-extension"
+  ],
   "workspaces": [
     "packages/*"
   ],
+  "files": [
+    "packages/*/index.ts",
+    "packages/*/src",
+    "packages/*/snippets",
+    "!**/*.test.ts"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "pi": {
     "extensions": [
-      "./packages/*/src/index.ts"
+      "./packages/*/src/index.ts",
+      "./packages/pi-hot-compact/index.ts",
+      "./node_modules/@cheetahbyte/pi-subagents/src/index.ts",
+      "./node_modules/pi-footer/src/index.ts"
+    ],
+    "skills": [
+      "./node_modules/@cheetahbyte/pi-subagents/skills"
     ]
   },
   "scripts": {
-    "typecheck": "bunx tsc --noEmit",
-    "test": "bun test"
+    "typecheck": "tsc --noEmit",
+    "test": "bun test",
+    "pack": "sh scripts/pack-kit.sh",
+    "set-version": "node scripts/version.mjs"
+  },
+  "dependencies": {
+    "@cheetahbyte/pi-subagents": "^0.20.1",
+    "pi-footer": "^0.5.1"
+  },
+  "bundledDependencies": [
+    "@cheetahbyte/pi-subagents",
+    "pi-footer"
+  ],
+  "peerDependencies": {
+    "@earendil-works/pi-ai": "*",
+    "@earendil-works/pi-coding-agent": "*",
+    "@earendil-works/pi-tui": "*",
+    "typebox": "*"
   },
   "devDependencies": {
+    "@types/bun": "^1",
+    "@types/node": "^22",
     "typescript": "^7"
   }
 }

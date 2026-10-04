@@ -1,22 +1,16 @@
-# Ask user question
+# Pi ask user question
 
-A Pi extension that registers `ask_user_question`. Inspired by Claude Code's structured questions and [rpiv-ask-user-question](https://github.com/juicesharp/rpiv-mono/tree/main/packages/rpiv-ask-user-question), with an optional model-authored question on a separate **Notes** tab.
+`@cheetahbyte/pi-ask-user-question` registers the `ask_user_question` tool, which lets the model ask you structured questions. It's inspired by Claude Code's structured questions and [rpiv-ask-user-question](https://github.com/juicesharp/rpiv-mono/tree/main/packages/rpiv-ask-user-question), and adds an optional model-authored question on a separate **Notes** tab.
 
-## Load the extension
-
-From the repository root, try it for one session:
+## Install
 
 ```sh
-pi -e ./packages/pi-ask-user-question/src/index.ts
+pi install npm:@cheetahbyte/pi-ask-user-question
 ```
 
-To install the local package:
+This package is part of [Pi kit](https://github.com/cheetahbyte/pi-kit). If you install the kit, don't install this package separately.
 
-```sh
-pi install ./packages/pi-ask-user-question
-```
-
-If Pi already loads this repository as a package, its extension glob includes this package. Don't also load another extension that registers `ask_user_question`.
+Don't also load another extension that registers `ask_user_question`.
 
 ## Ask questions
 
@@ -86,12 +80,3 @@ The tool returns JSON text and matching result details:
 `kind` is `option`, `multi`, or `custom`. Custom answers use `text` and an empty `selected` array. Blank notes omit `additionalContext`. Cancellation returns `{ "cancelled": true, "answers": [] }`, without drafts.
 
 This is an independent terminal implementation, not a drop-in fork of RPIV. It doesn't include RPIV's localization, per-question notes, collapse shortcut, external-editor integration, or native RPC dialogs. Outside interactive terminal mode, calls fail with guidance to ask in chat instead.
-
-## Verify the package
-
-```sh
-bun run --cwd packages/pi-ask-user-question typecheck
-bun run --cwd packages/pi-ask-user-question test
-```
-
-Tests use Pi's editor and terminal renderer with an in-memory terminal boundary. They don't make network requests or model calls.

@@ -1,0 +1,35 @@
+{
+  "name": "@cheetahbyte/pi-hooks",
+  "version": "0.3.0",
+  "description": "Pi extension that runs Claude Code-style command hooks from ~/.pi/agent/hooks.json and .pi/hooks.json.",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cheetahbyte/pi-kit.git",
+    "directory": "packages/pi-hooks"
+  },
+  "keywords": [
+    "pi-package",
+    "pi-extension"
+  ],
+  "files": [
+    "src"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*"
+  },
+  "pi": {
+    "extensions": [
+      "./src/index.ts"
+    ]
+  },
+  "devDependencies": {
+    "@earendil-works/pi-coding-agent": "^1.0.2",
+    "@types/node": "^22",
+    "typescript": "^7"
+  }
+}

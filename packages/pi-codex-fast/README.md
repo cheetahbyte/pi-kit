@@ -1,22 +1,14 @@
-# Codex fast models
+# Pi Codex fast
 
-Select `openai-codex/<model>-fast` to request Codex's priority service tier. Select the normal model to turn it off.
+`@cheetahbyte/pi-codex-fast` adds `-fast` variants of Codex models. Select `openai-codex/<model>-fast` to request Codex's priority service tier. Select the normal model to turn it off.
 
-## Load the extension
-
-From the repository root:
+## Install
 
 ```sh
-pi -e ./packages/pi-codex-fast/src/index.ts
+pi install npm:@cheetahbyte/pi-codex-fast
 ```
 
-To install it persistently:
-
-```sh
-pi install ./packages/pi-codex-fast
-```
-
-If you already load the entire `pi-kit` package, run `/reload` instead.
+This package is part of [Pi kit](https://github.com/cheetahbyte/pi-kit). If you install the kit, don't install this package separately.
 
 ## Select a fast model
 
@@ -67,10 +59,3 @@ This extension does not enable Ultrafast.
 
 See [Codex speed documentation](https://developers.openai.com/codex/speed/) and the
 [Codex priority request mapping](https://github.com/openai/codex/blob/main/codex-rs/protocol/src/config_types.rs).
-
-## Verify changes
-
-```sh
-bun run --cwd packages/pi-codex-fast typecheck
-bun test
-```

@@ -1,16 +1,37 @@
 {
   "name": "@cheetahbyte/pi-todo",
-  "private": true,
+  "version": "0.3.0",
+  "description": "Pi extension that gives the agent a todo tool with a task graph and a /todos view.",
   "type": "module",
-  "peerDependencies": { "@earendil-works/pi-coding-agent": "*" },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cheetahbyte/pi-kit.git",
+    "directory": "packages/pi-todo"
+  },
+  "keywords": [
+    "pi-package",
+    "pi-extension"
+  ],
+  "files": [
+    "src"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*",
+    "typebox": "*"
+  },
   "pi": {
     "extensions": [
       "./src/index.ts"
     ]
   },
   "devDependencies": {
-    "@earendil-works/pi-coding-agent": "^0.86.0",
-    "@earendil-works/pi-tui": "^0.86.0",
-    "typescript": "^7"
+    "@earendil-works/pi-coding-agent": "^1.0.2",
+    "@earendil-works/pi-tui": "^1.0.2",
+    "typescript": "^7",
+    "typebox": "^1"
   }
 }

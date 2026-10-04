@@ -2,6 +2,14 @@
 
 `@cheetahbyte/pi-header` replaces Pi's interactive header with a compact view of prompts, skills, extensions, and context.
 
+## Install
+
+```sh
+pi install npm:@cheetahbyte/pi-header
+```
+
+This package is part of [Pi kit](https://github.com/cheetahbyte/pi-kit). If you install the kit, don't install this package separately.
+
 ## Context display
 
 The **Context** row keeps the working-directory name and shows the exact source paths reported by Pi's `ResourceLoader`, in Pi's built-in order:

@@ -25,6 +25,7 @@ test("header renders Pi-reported arbitrary context source paths", async () => {
       setUIContext: () => {},
       bindCommandContext: () => {},
       onError: () => () => {},
+      reportUnhandledMcpServers: () => {},
       emit: async () => {},
     },
     _extensionUIContext: {},

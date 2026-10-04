@@ -1,7 +1,14 @@
 # Pi snippets
 
-Add reusable text before or after your messages. Open `/snippets` or press
-**Ctrl+Alt+P** to configure each snippet.
+`@cheetahbyte/pi-snippets` adds reusable text before or after your messages. Open `/snippets` or press **Ctrl+Alt+P** to configure each snippet.
+
+## Install
+
+```sh
+pi install npm:@cheetahbyte/pi-snippets
+```
+
+This package is part of [Pi kit](https://github.com/cheetahbyte/pi-kit). If you install the kit, don't install this package separately.
 
 ## Choose when a snippet applies
 

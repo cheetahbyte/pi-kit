@@ -1,7 +1,24 @@
 {
   "name": "@cheetahbyte/pi-codex-fast",
-  "private": true,
+  "version": "0.3.0",
+  "description": "Pi extension that adds -fast variants of Codex models using the priority service tier.",
   "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cheetahbyte/pi-kit.git",
+    "directory": "packages/pi-codex-fast"
+  },
+  "keywords": [
+    "pi-package",
+    "pi-extension"
+  ],
+  "files": [
+    "src"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
     "@earendil-works/pi-ai": "*",
     "@earendil-works/pi-coding-agent": "*"
