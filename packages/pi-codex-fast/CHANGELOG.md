@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Remove the pi-footer and native fast-mode indicators; the selected model name identifies fast mode.
+
 - Replace `/fast` and separate preferences with selectable `openai-codex/<model>-fast` aliases, including RPC selection, priority request mapping, 2× pricing metadata, and the existing `⚡ fast` footer indicator.
 
 - Display `⚡ fast` only when enabled and persist the preference per provider/model across sessions and restarts, replacing session-scoped state.

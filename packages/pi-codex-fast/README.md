@@ -50,20 +50,7 @@ The aliases are available through the normal model registry and RPC model select
 ```
 
 To disable fast mode, select `gpt-6.1-sol` instead.
-RPC clients receive the native status through `extension_ui_request` records with `method: "setStatus"`.
-
-## Configure pi-footer
-
-Add a **Pi Event Value** widget with **Widget ID** `codex-fast`.
-Enable **Hide when empty** and leave the icon option empty.
-The widget displays `⚡ fast` for a fast alias and nothing for normal models.
-
-Hide `pi-codex-fast` in pi-footer's extension status row to avoid a duplicate native indicator.
-In `pi-footer.json`, add it to `extensionStatusRow.hiddenKeys`.
-Publishing events does not automatically add a widget to your footer configuration.
-Existing `codex-fast` widgets continue to work without changes.
-
-Alternatively, use a **Pi Extension Status** widget with **Status key** `pi-codex-fast`.
+The selected model's `-fast` suffix identifies fast mode. No separate pi-footer or native status indicator is published.
 
 ## Pricing and availability
 

@@ -88,14 +88,10 @@ function extensionSetup() {
   return { handlers, widgets, ctx, models };
 }
 
-test("selection alone controls the pi-footer indicator", () => {
-  const { handlers, widgets, ctx, models } = extensionSetup();
-  expect(ctx.model).toBeDefined();
-  handlers.get("session_start")({}, ctx);
-  expect(widgets.at(-1)).toEqual({ event: "pi-footer:update-widget", payload: { widgetId: "codex-fast", value: "⚡ fast" } });
-  ctx.model = models.find(model => !model.id.endsWith("-fast"));
-  handlers.get("model_select")({}, ctx);
-  expect(widgets.at(-1).payload.value).toBeNull();
+test("extension registers no footer or native status handlers", () => {
+  const { handlers, widgets } = extensionSetup();
+  expect([...handlers.keys()]).toEqual(["message_end"]);
+  expect(widgets).toEqual([]);
 });
 
 test("message pricing uses alias rates rather than stacking provider multipliers", () => {
