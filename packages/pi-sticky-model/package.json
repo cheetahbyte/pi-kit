@@ -1,0 +1,35 @@
+{
+  "name": "@cheetahbyte/pi-sticky-model",
+  "version": "0.3.0",
+  "description": "Pi extension that remembers the model you switch to and the thinking level you pick for each model.",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cheetahbyte/pi-kit.git",
+    "directory": "packages/pi-sticky-model"
+  },
+  "keywords": [
+    "pi-package",
+    "pi-extension"
+  ],
+  "files": [
+    "src"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*"
+  },
+  "pi": {
+    "extensions": [
+      "./src/index.ts"
+    ]
+  },
+  "devDependencies": {
+    "@earendil-works/pi-coding-agent": "^1.0.2",
+    "@types/node": "^22",
+    "typescript": "^7"
+  }
+}

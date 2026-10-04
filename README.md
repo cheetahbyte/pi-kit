@@ -27,11 +27,13 @@ Each package in `packages/` is also published on its own. Install one with `pi i
 | `@cheetahbyte/pi-ask-user-question` | The `ask_user_question` tool for structured questions. |
 | `@cheetahbyte/pi-btw` | `/btw` asks a side question without adding it to the conversation. |
 | `@cheetahbyte/pi-codex-fast` | `-fast` variants of Codex models. |
+| `@cheetahbyte/pi-claude-code` | `claude_code` tool and `/claude` command that delegate tasks to headless Claude Code on your Claude subscription. |
 | `@cheetahbyte/pi-context` | `/context` shows what fills the context window. |
 | `@cheetahbyte/pi-header` | A compact header with prompts, skills, extensions, and context. |
 | `@cheetahbyte/pi-hooks` | Claude Code-style command hooks from `~/.pi/agent/hooks.json` and `.pi/hooks.json`. |
 | `pi-hot-compact` | Background compaction and recall of omitted history. |
 | `@cheetahbyte/pi-snippets` | Reusable text before or after your messages. |
+| `@cheetahbyte/pi-sticky-model` | Remembers the model you switch to and the thinking level for each model. |
 | `@cheetahbyte/pi-stats` | `/stats` shows cost, token, model, project, tool, and skill usage. |
 | `@cheetahbyte/pi-todo` | A todo tool with a task graph and `/todos`. |
 | `@cheetahbyte/pi-web` | Web search and page fetching without an API key. |

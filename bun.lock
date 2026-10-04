@@ -52,6 +52,22 @@
         "@earendil-works/pi-tui": "*",
       },
     },
+    "packages/pi-claude-code": {
+      "name": "@cheetahbyte/pi-claude-code",
+      "version": "0.3.0",
+      "devDependencies": {
+        "@earendil-works/pi-coding-agent": "^1.0.2",
+        "@earendil-works/pi-tui": "^1.0.2",
+        "@types/bun": "^1",
+        "typebox": "^1",
+        "typescript": "^7",
+      },
+      "peerDependencies": {
+        "@earendil-works/pi-coding-agent": "*",
+        "@earendil-works/pi-tui": "*",
+        "typebox": "*",
+      },
+    },
     "packages/pi-codex-fast": {
       "name": "@cheetahbyte/pi-codex-fast",
       "version": "0.3.0",
@@ -147,6 +163,18 @@
         "@earendil-works/pi-tui": "*",
       },
     },
+    "packages/pi-sticky-model": {
+      "name": "@cheetahbyte/pi-sticky-model",
+      "version": "0.3.0",
+      "devDependencies": {
+        "@earendil-works/pi-coding-agent": "^1.0.2",
+        "@types/node": "^22",
+        "typescript": "^7",
+      },
+      "peerDependencies": {
+        "@earendil-works/pi-coding-agent": "*",
+      },
+    },
     "packages/pi-todo": {
       "name": "@cheetahbyte/pi-todo",
       "version": "0.3.0",
@@ -223,6 +251,8 @@
 
     "@cheetahbyte/pi-btw": ["@cheetahbyte/pi-btw@workspace:packages/pi-btw"],
 
+    "@cheetahbyte/pi-claude-code": ["@cheetahbyte/pi-claude-code@workspace:packages/pi-claude-code"],
+
     "@cheetahbyte/pi-codex-fast": ["@cheetahbyte/pi-codex-fast@workspace:packages/pi-codex-fast"],
 
     "@cheetahbyte/pi-context": ["@cheetahbyte/pi-context@workspace:packages/pi-context"],
@@ -234,6 +264,8 @@
     "@cheetahbyte/pi-snippets": ["@cheetahbyte/pi-snippets@workspace:packages/pi-snippets"],
 
     "@cheetahbyte/pi-stats": ["@cheetahbyte/pi-stats@workspace:packages/pi-stats"],
+
+    "@cheetahbyte/pi-sticky-model": ["@cheetahbyte/pi-sticky-model@workspace:packages/pi-sticky-model"],
 
     "@cheetahbyte/pi-subagents": ["@cheetahbyte/pi-subagents@0.20.1", "", { "dependencies": { "croner": "^10.0.1", "nanoid": "^5.1.16" }, "peerDependencies": { "@earendil-works/pi-ai": ">=0.87.0", "@earendil-works/pi-coding-agent": ">=0.87.0", "@earendil-works/pi-tui": ">=0.87.0", "@sinclair/typebox": "*", "typebox": "*" } }, "sha512-vSaSPnq7jaSgTr2jTRHzCytOanZxgHd8ly+YhYiLnFe2XW5YMcWwSpxTxfItpI/0dRowuYGc28S4vpSohyFdvg=="],
 
