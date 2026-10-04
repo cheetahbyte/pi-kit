@@ -34,6 +34,7 @@ Each package in `packages/` is also published on its own. Install one with `pi i
 | `@cheetahbyte/pi-snippets` | Reusable text before or after your messages. |
 | `@cheetahbyte/pi-stats` | `/stats` shows cost, token, model, project, tool, and skill usage. |
 | `@cheetahbyte/pi-todo` | A todo tool with a task graph and `/todos`. |
+| `@cheetahbyte/pi-web` | Web search and page fetching without an API key. |
 
 The kit also bundles two packages that are maintained elsewhere:
 
@@ -44,11 +45,7 @@ The kit also bundles two packages that are maintained elsewhere:
 
 If you install the kit, remove these packages and any single kit package from your Pi settings. Otherwise Pi loads them twice.
 
-Web search isn't part of the kit. For that, install [`pi-web-access`](https://github.com/nicobailon/pi-web-access) separately:
-
-```sh
-pi install npm:pi-web-access
-```
+`@cheetahbyte/pi-web` registers the same tool names as [`pi-web-access`](https://github.com/nicobailon/pi-web-access), so remove that package too. Keep it instead of the kit's web tools only if you need its PDF or video support, and then disable the `pi-web` extension with `pi config`.
 
 ## Develop
 
@@ -76,7 +73,7 @@ All packages and the kit share one version. A GitHub Actions workflow publishes 
    git push --follow-tags
    ```
 
-The workflow in `.github/workflows/release.yml` checks that every manifest matches the tag, runs the typecheck and the tests, and publishes the ten packages and the kit. A version that is already on npm is skipped, so you can run a failed release again.
+The workflow in `.github/workflows/release.yml` checks that every manifest matches the tag, runs the typecheck and the tests, and publishes the packages and the kit. A version that is already on npm is skipped, so you can run a failed release again.
 
 The workflow uses npm trusted publishing and needs no token. Each package on npmjs.com must list this repository and `release.yml` as a trusted publisher.
 

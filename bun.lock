@@ -161,6 +161,20 @@
         "typebox": "*",
       },
     },
+    "packages/pi-web": {
+      "name": "@cheetahbyte/pi-web",
+      "version": "0.3.0",
+      "devDependencies": {
+        "@earendil-works/pi-coding-agent": "^1.0.2",
+        "@types/node": "^22",
+        "typebox": "^1",
+        "typescript": "^7",
+      },
+      "peerDependencies": {
+        "@earendil-works/pi-coding-agent": "*",
+        "typebox": "*",
+      },
+    },
   },
   "packages": {
     "@anthropic-ai/sdk": ["@anthropic-ai/sdk@0.129.0", "", { "dependencies": { "json-schema-to-ts": "^3.1.1", "standardwebhooks": "^1.0.0" }, "peerDependencies": { "zod": "^3.25.0 || ^4.0.0" }, "optionalPeers": ["zod"], "bin": { "anthropic-ai-sdk": "bin/cli" } }, "sha512-MH7LB20kNpGLUpPTe2OG5XvL/KhX8HUO9XyBaFjgFk6TLS4Xjt0VPIuMKywe7POKKPslX+QxSlVok9e+8kG5Nw=="],
@@ -224,6 +238,8 @@
     "@cheetahbyte/pi-subagents": ["@cheetahbyte/pi-subagents@0.20.1", "", { "dependencies": { "croner": "^10.0.1", "nanoid": "^5.1.16" }, "peerDependencies": { "@earendil-works/pi-ai": ">=0.87.0", "@earendil-works/pi-coding-agent": ">=0.87.0", "@earendil-works/pi-tui": ">=0.87.0", "@sinclair/typebox": "*", "typebox": "*" } }, "sha512-vSaSPnq7jaSgTr2jTRHzCytOanZxgHd8ly+YhYiLnFe2XW5YMcWwSpxTxfItpI/0dRowuYGc28S4vpSohyFdvg=="],
 
     "@cheetahbyte/pi-todo": ["@cheetahbyte/pi-todo@workspace:packages/pi-todo"],
+
+    "@cheetahbyte/pi-web": ["@cheetahbyte/pi-web@workspace:packages/pi-web"],
 
     "@earendil-works/chord": ["@earendil-works/chord@1.0.2", "", { "dependencies": { "esbuild": "0.28.2" } }, "sha512-eUXGZjigyEQsFiT/oBJUOaCrzYZRmqf8AgLrlbyuS4u02hjSVhLYRi3xqk1o4UERCgRfjRegqwj/oucawIR7YQ=="],
 

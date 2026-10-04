@@ -1,7 +1,7 @@
 {
   "name": "@cheetahbyte/pi-kit",
   "version": "0.3.0",
-  "description": "A batteries-included set of Pi extensions: subagents, hot compaction, todo, hooks, stats, footer, header, and more.",
+  "description": "A batteries-included set of Pi extensions: subagents, hot compaction, todo, hooks, stats, footer, header, web search, and more.",
   "license": "MIT",
   "repository": {
     "type": "git",
