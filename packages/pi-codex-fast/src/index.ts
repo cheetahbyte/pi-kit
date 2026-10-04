@@ -1,5 +1,7 @@
 import { calculateCost } from "@earendil-works/pi-ai";
-import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
+import { getAgentDir, type ExtensionAPI, type ExtensionContext } from "@earendil-works/pi-coding-agent";
+import { join } from "node:path";
+import { readPreference, writePreference } from "./settings.js";
 
 const stateType = "pi-codex-fast";
 
@@ -12,7 +14,7 @@ function isCompatible(ctx: ExtensionContext): boolean {
     && ctx.model.api === "openai-codex-responses";
 }
 
-export default function (pi: ExtensionAPI): void {
+export default function (pi: ExtensionAPI, settingsDirectory = join(getAgentDir(), "extensions", "pi-codex-fast")): void {
   let enabled = false;
   let requestModel: ExtensionContext["model"];
 
@@ -22,7 +24,7 @@ export default function (pi: ExtensionAPI): void {
         : "Fast mode on (inactive: incompatible model)";
 
   const updateStatus = (ctx: ExtensionContext): void => {
-    const value = enabled ? isCompatible(ctx) ? "Fast: on" : "Fast: inactive" : null;
+    const value = enabled && isCompatible(ctx) ? "⚡ fast" : null;
     pi.events.emit("pi-footer:update-widget", { widgetId: "codex-fast", value });
     if (ctx.hasUI) {
       ctx.ui.setStatus(stateType, value ?? undefined);
@@ -30,20 +32,23 @@ export default function (pi: ExtensionAPI): void {
   };
 
   const restore = (ctx: ExtensionContext): void => {
-    requestModel = undefined;
     enabled = false;
-    for (const entry of ctx.sessionManager.getBranch()) {
-      if (entry.type === "custom" && entry.customType === stateType
-        && isRecord(entry.data) && typeof entry.data.enabled === "boolean") {
-        enabled = entry.data.enabled;
+    if (isCompatible(ctx) && ctx.model) {
+      try {
+        enabled = readPreference(settingsDirectory, ctx.model.provider, ctx.model.id);
+      } catch (error) {
+        ctx.ui.notify(`Could not read fast-mode preference: ${String(error)}`, "error");
       }
     }
     updateStatus(ctx);
   };
 
-  pi.on("session_start", (_event, ctx) => restore(ctx));
+  pi.on("session_start", (_event, ctx) => {
+    requestModel = undefined;
+    restore(ctx);
+  });
   pi.on("session_tree", (_event, ctx) => restore(ctx));
-  pi.on("model_select", (_event, ctx) => updateStatus(ctx));
+  pi.on("model_select", (_event, ctx) => restore(ctx));
   pi.on("session_shutdown", (_event, ctx) => {
     pi.events.emit("pi-footer:update-widget", { widgetId: "codex-fast", value: null });
     if (ctx.hasUI) ctx.ui.setStatus(stateType, undefined);
@@ -90,12 +95,17 @@ export default function (pi: ExtensionAPI): void {
         return;
       }
       const next = action === "" ? !enabled : action === "on";
-      if (next && !isCompatible(ctx)) {
+      if (!isCompatible(ctx) || !ctx.model) {
         ctx.ui.notify("Fast mode requires a supported openai-codex model. See pi-codex-fast/README.md.", "warning");
         return;
       }
+      try {
+        writePreference(settingsDirectory, ctx.model.provider, ctx.model.id, next);
+      } catch (error) {
+        ctx.ui.notify(`Could not save fast-mode preference: ${String(error)}`, "error");
+        return;
+      }
       enabled = next;
-      pi.appendEntry(stateType, { enabled });
       updateStatus(ctx);
       ctx.ui.notify(enabled
         ? "Fast mode on for subsequent requests. Higher usage rates apply; account eligibility is required."

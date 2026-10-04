@@ -1,7 +1,17 @@
-import { expect, test } from "bun:test";
+import { afterEach, expect, test } from "bun:test";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+
+const directories = [];
+afterEach(() => {
+  for (const directory of directories.splice(0)) rmSync(directory, { recursive: true, force: true });
+});
 import extension from "../src/index.ts";
 
 function setup(provider = "openai-codex") {
+  const directory = mkdtempSync(join(tmpdir(), "pi-codex-fast-test-"));
+  directories.push(directory);
   const handlers = new Map();
   const commands = new Map();
   const widgets = [];
@@ -22,7 +32,7 @@ function setup(provider = "openai-codex") {
     registerCommand: (name, command) => commands.set(name, command),
     appendEntry() {},
     events: { emit: (event, payload) => widgets.push({ event, payload }) },
-  });
+  }, directory);
   return { handlers, commands, widgets, notifications, ctx };
 }
 
@@ -32,7 +42,7 @@ test("gpt-5.6-sol enables priority requests and updates pi-footer", async () => 
   expect(notifications.some(({ level }) => level === "warning")).toBe(false);
   expect(widgets.at(-1)).toEqual({
     event: "pi-footer:update-widget",
-    payload: { widgetId: "codex-fast", value: "Fast: on" },
+    payload: { widgetId: "codex-fast", value: "⚡ fast" },
   });
   const payload = { model: "gpt-5.6-sol", reasoning: { effort: "medium" } };
   const request = handlers.get("before_provider_request");

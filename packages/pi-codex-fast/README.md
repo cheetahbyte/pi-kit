@@ -24,11 +24,12 @@ If you already load the entire `pi-kit` package, reload Pi instead.
 - Run `/fast on` or `/fast off` to set it explicitly.
 - Run `/fast status` to inspect the current setting.
 
-Fast mode defaults to off. The setting follows the session branch and survives resume and reload.
-New sessions start with fast mode off. Changes apply to subsequent requests, not requests already in flight.
+Fast mode defaults to off for each model. The setting is saved per provider/model across sessions, reloads, and restarts.
+Switching models restores that model's saved preference. Changes apply to subsequent requests, not requests already in flight.
+Preferences are stored as individual JSON files in `~/.pi/agent/extensions/pi-codex-fast/` (under Pi's configured agent directory).
+Old session-scoped settings are no longer used; run `/fast on` once for each model you want enabled.
 
-The footer shows `Fast: on` when enabled on a compatible model.
-Switching to an incompatible model leaves the preference enabled but shows `Fast: inactive`.
+The footer shows `⚡ fast` when enabled on a compatible model, and nothing when off or on an incompatible provider.
 
 ## Configure pi-footer
 
@@ -38,7 +39,7 @@ Hide the `pi-codex-fast` entry in pi-footer's extension status row to avoid a du
 In `pi-footer.json`, this means adding `pi-codex-fast` to `extensionStatusRow.hiddenKeys`.
 Publishing events does not automatically add a widget to your footer configuration.
 
-The widget displays `Fast: on` or `Fast: inactive`, matching the native status.
+The widget displays `⚡ fast`, matching the native status. Leave the widget's icon option empty because the value includes the lightning icon.
 The extension republishes its value after session changes, reload, model selection, and mode changes, and clears it on shutdown.
 
 Alternatively, use a **Pi Extension Status** widget with **Status key** set to `pi-codex-fast`.

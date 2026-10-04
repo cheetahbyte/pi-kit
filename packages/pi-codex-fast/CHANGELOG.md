@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Display `⚡ fast` only when enabled and persist the preference per provider/model across sessions and restarts, replacing session-scoped state.
+
 - Record fast-mode requests at 2× base monetary cost in Pi and pi-footer, without double-counting provider priority adjustments.
 
 - Allow all `openai-codex` models using the Codex API without model-name filtering.
