@@ -1,118 +1,110 @@
-import { afterEach, expect, test } from "bun:test";
-import { mkdtempSync, rmSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
-
-const directories = [];
-afterEach(() => {
-  for (const directory of directories.splice(0)) rmSync(directory, { recursive: true, force: true });
-});
+import { expect, test } from "bun:test";
 import extension from "../src/index.ts";
+import { createFastProvider } from "../src/provider.ts";
 
-function setup(provider = "openai-codex") {
-  const directory = mkdtempSync(join(tmpdir(), "pi-codex-fast-test-"));
-  directories.push(directory);
-  const handlers = new Map();
-  const commands = new Map();
-  const widgets = [];
-  const notifications = [];
-  const ctx = {
-    model: {
-      provider, api: "openai-codex-responses", id: "gpt-5.6-sol",
-      cost: { input: 2, output: 10, cacheRead: 0.2, cacheWrite: 2 },
-    },
-    hasUI: true,
-    ui: {
-      setStatus() {},
-      notify: (message, level) => notifications.push({ message, level }),
-    },
+const model = {
+  id: "gpt-example", name: "Example", provider: "openai-codex", api: "openai-codex-responses",
+  reasoning: true, input: ["text", "image"], contextWindow: 100000, maxTokens: 10000,
+  cost: { input: 2, output: 10, cacheRead: 0.2, cacheWrite: 2,
+    tiers: [{ inputTokensAbove: 100000, input: 4, output: 20, cacheRead: 0.4, cacheWrite: 4 }] },
+};
+
+function setup() {
+  const calls = [];
+  const stream = (selected, context, options) => {
+    calls.push({ selected, context, options });
+    return "stream";
   };
-  extension({
-    on: (event, handler) => handlers.set(event, handler),
-    registerCommand: (name, command) => commands.set(name, command),
-    appendEntry() {},
-    events: { emit: (event, payload) => widgets.push({ event, payload }) },
-  }, directory);
-  return { handlers, commands, widgets, notifications, ctx };
+  const base = { id: "openai-codex", name: "Codex", auth: { oauth: {} },
+    getModels: () => [model], stream, streamSimple: stream };
+  return { base, provider: createFastProvider(base), calls };
 }
 
-test("gpt-5.6-sol enables priority requests and updates pi-footer", async () => {
-  const { handlers, commands, widgets, notifications, ctx } = setup();
-  await commands.get("fast").handler("on", ctx);
-  expect(notifications.some(({ level }) => level === "warning")).toBe(false);
-  expect(widgets.at(-1)).toEqual({
-    event: "pi-footer:update-widget",
-    payload: { widgetId: "codex-fast", value: "⚡ fast" },
+test("aliases preserve originals, capabilities, and OAuth while doubling all price tiers", () => {
+  const { base, provider } = setup();
+  const [original, fast] = provider.getModels();
+  expect(original).toBe(model);
+  expect(provider.auth).toBe(base.auth);
+  expect(fast).toMatchObject({ ...model, id: "gpt-example-fast", name: "Example Fast",
+    cost: { input: 4, output: 20, cacheRead: 0.4, cacheWrite: 4,
+      tiers: [{ inputTokensAbove: 100000, input: 8, output: 40, cacheRead: 0.8, cacheWrite: 8 }] } });
+});
+
+for (const method of ["stream", "streamSimple"]) {
+  test(`${method} sends original model and priority, preserving request hooks`, async () => {
+    const { provider, calls } = setup();
+    const alias = provider.getModels()[1];
+    const context = { messages: [] };
+    let observed;
+    const signal = new AbortController().signal;
+    expect(provider[method](alias, context, { signal,
+      onPayload: (payload) => { observed = payload; return { ...payload, extra: true }; },
+    })).toBe("stream");
+    const call = calls[0];
+    expect(call.selected.id).toBe("gpt-example-fast");
+    expect(call.options.signal).toBe(signal);
+    const payload = await call.options.onPayload({ model: alias.id, reasoning: { effort: "high" } }, alias);
+    expect(observed).toEqual({ model: model.id, service_tier: "priority", reasoning: { effort: "high" } });
+    expect(payload).toEqual({ ...observed, extra: true });
+    expect(call.context).toBe(context);
   });
-  const payload = { model: "gpt-5.6-sol", reasoning: { effort: "medium" } };
-  const request = handlers.get("before_provider_request");
-  expect(request({ payload }, ctx)).toEqual({ ...payload, service_tier: "priority" });
-  expect(payload).not.toHaveProperty("service_tier");
-  await commands.get("fast").handler("off", ctx);
-  expect(request({ payload }, ctx)).toBeUndefined();
+}
+
+test("normal models retain their stream options unchanged", () => {
+  const { provider, calls } = setup();
+  const options = { onPayload() {} };
+  provider.streamSimple(model, { messages: [] }, options);
+  expect(calls[0].options).toBe(options);
+});
+
+test("existing fast IDs are not overwritten or duplicated", () => {
+  const { base } = setup();
+  const existing = { ...model, id: "gpt-example-fast" };
+  base.getModels = () => [model, existing];
+  expect(createFastProvider(base).getModels()).toEqual([model, existing]);
+});
+
+test("provider credential filtering applies to aliases too", () => {
+  const { base } = setup();
+  base.filterModels = () => [];
+  const provider = createFastProvider(base);
+  expect(provider.filterModels(provider.getModels(), undefined)).toEqual([]);
+});
+
+function extensionSetup() {
+  const handlers = new Map();
+  const widgets = [];
+  let provider;
+  extension({
+    registerProvider: value => { provider = value; },
+    on: (name, handler) => handlers.set(name, handler),
+    events: { emit: (event, payload) => widgets.push({ event, payload }) },
+  });
+  const models = provider.getModels();
+  const ctx = { model: models.find(model => model.id.endsWith("-fast")), hasUI: true,
+    ui: { setStatus() {} },
+    modelRegistry: { find: (provider, id) => models.find(model => model.provider === provider && model.id === id) },
+  };
+  return { handlers, widgets, ctx, models };
+}
+
+test("selection alone controls the pi-footer indicator", () => {
+  const { handlers, widgets, ctx, models } = extensionSetup();
+  expect(ctx.model).toBeDefined();
+  handlers.get("session_start")({}, ctx);
+  expect(widgets.at(-1)).toEqual({ event: "pi-footer:update-widget", payload: { widgetId: "codex-fast", value: "⚡ fast" } });
+  ctx.model = models.find(model => !model.id.endsWith("-fast"));
+  handlers.get("model_select")({}, ctx);
   expect(widgets.at(-1).payload.value).toBeNull();
 });
 
-function assistantMessage(multiplier = 1) {
-  return {
-    role: "assistant", provider: "openai-codex", api: "openai-codex-responses",
-    model: "gpt-5.6-sol", content: [], stopReason: "stop", timestamp: 0,
-    usage: {
-      input: 1000000, output: 1000000, cacheRead: 1000000, cacheWrite: 1000000,
-      totalTokens: 4000000,
-      cost: { input: 2 * multiplier, output: 10 * multiplier,
-        cacheRead: 0.2 * multiplier, cacheWrite: 2 * multiplier, total: 14.2 * multiplier },
-    },
+test("message pricing uses alias rates rather than stacking provider multipliers", () => {
+  const { handlers, ctx } = extensionSetup();
+  const message = { role: "assistant", provider: ctx.model.provider, api: ctx.model.api, model: ctx.model.id,
+    usage: { input: 1, output: 0, cacheRead: 0, cacheWrite: 0, totalTokens: 1,
+      cost: { input: 999, output: 0, cacheRead: 0, cacheWrite: 0, total: 999 } },
   };
-}
-
-for (const existingMultiplier of [1, 2, 2.5]) {
-  test(`fast request records 2x cost without stacking on ${existingMultiplier}x provider pricing`, async () => {
-    const { handlers, commands, ctx } = setup();
-    await commands.get("fast").handler("on", ctx);
-    handlers.get("before_provider_request")({ payload: { model: ctx.model.id } }, ctx);
-    await commands.get("fast").handler("off", ctx);
-    const message = assistantMessage(existingMultiplier);
-    const result = handlers.get("message_end")?.({ message }, ctx);
-    expect(result?.message.usage.cost).toEqual({ input: 4, output: 20, cacheRead: 0.4, cacheWrite: 4, total: 28.4 });
-    expect(message.usage.cost.input).toBe(2 * existingMultiplier);
-    expect(handlers.get("message_end")({ message: result.message }, ctx)).toBeUndefined();
-  });
-}
-
-test("pricing uses request-time rates after a model switch", async () => {
-  const { handlers, commands, ctx } = setup();
-  await commands.get("fast").handler("on", ctx);
-  handlers.get("before_provider_request")({ payload: { model: ctx.model.id } }, ctx);
-  ctx.model.cost.input = 999;
-  ctx.model.id = "different-model";
-  const result = handlers.get("message_end")({ message: assistantMessage() }, ctx);
-  expect(result.message.usage.cost.input).toBe(4);
-});
-
-test("unrelated messages and ended runs cannot consume stale fast pricing", async () => {
-  const { handlers, commands, ctx } = setup();
-  await commands.get("fast").handler("on", ctx);
-  handlers.get("before_provider_request")({ payload: { model: ctx.model.id } }, ctx);
-  expect(handlers.get("message_end")({
-    message: { ...assistantMessage(), provider: "other-provider" },
-  }, ctx)).toBeUndefined();
-  handlers.get("agent_end")({}, ctx);
-  expect(handlers.get("message_end")({ message: assistantMessage() }, ctx)).toBeUndefined();
-});
-
-test("enabling fast after a standard request does not change its pricing", async () => {
-  const { handlers, commands, ctx } = setup();
-  handlers.get("before_provider_request")({ payload: { model: ctx.model.id } }, ctx);
-  await commands.get("fast").handler("on", ctx);
-  expect(handlers.get("message_end")?.({ message: assistantMessage() }, ctx)).toBeUndefined();
-});
-
-test("the model ID alone does not enable fast mode on other providers", async () => {
-  const { handlers, commands, notifications, ctx } = setup("other-provider");
-  await commands.get("fast").handler("on", ctx);
-  expect(notifications.at(-1).level).toBe("warning");
-  expect(handlers.get("before_provider_request")({
-    payload: { model: "gpt-5.6-sol" },
-  }, ctx)).toBeUndefined();
+  const result = handlers.get("message_end")({ message }, ctx);
+  expect(result.message.usage.cost.total).toBe(ctx.model.cost.input / 1000000);
+  expect(message.usage.cost.total).toBe(999);
 });

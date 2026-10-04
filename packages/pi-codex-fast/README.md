@@ -1,82 +1,85 @@
-# Codex fast mode
+# Codex fast models
 
-Request Codex's priority service tier without changing your model or reasoning effort.
+Select `openai-codex/<model>-fast` to request Codex's priority service tier. Select the normal model to turn it off.
 
 ## Load the extension
 
-From the repository root, start Pi with:
+From the repository root:
 
 ```sh
 pi -e ./packages/pi-codex-fast/src/index.ts
 ```
 
-To install it persistently, run:
+To install it persistently:
 
 ```sh
 pi install ./packages/pi-codex-fast
 ```
 
-If you already load the entire `pi-kit` package, reload Pi instead.
+If you already load the entire `pi-kit` package, run `/reload` instead.
 
-## Enable fast mode
+## Select a fast model
 
-- Run `/fast` to toggle fast mode.
-- Run `/fast on` or `/fast off` to set it explicitly.
-- Run `/fast status` to inspect the current setting.
+Use Pi's model picker to select a fast variant, for example:
 
-Fast mode defaults to off for each model. The setting is saved per provider/model across sessions, reloads, and restarts.
-Switching models restores that model's saved preference. Changes apply to subsequent requests, not requests already in flight.
-Preferences are stored as individual JSON files in `~/.pi/agent/extensions/pi-codex-fast/` (under Pi's configured agent directory).
-Old session-scoped settings are no longer used; run `/fast on` once for each model you want enabled.
+- `openai-codex/gpt-6.1-sol-fast`
+- `openai-codex/gpt-6-sol-fast`
+- `openai-codex/gpt-5.6-sol-fast`
 
-The footer shows `⚡ fast` when enabled on a compatible model, and nothing when off or on an incompatible provider.
+Or select it at startup:
+
+```sh
+pi --model openai-codex/gpt-6.1-sol-fast
+```
+
+The extension generates aliases from the running Pi version's built-in Codex catalog, not a hardcoded model-name allowlist.
+Normal models remain available. Fast aliases preserve the base model's capabilities and use the same Codex OAuth login.
+An existing model ending in `-fast` is not overwritten or given another suffix.
+Models added only through `models.json` do not automatically receive aliases; generated aliases can have their own `models.json` overrides.
+
+Requests send the original model ID with `service_tier: "priority"`. The `-fast` suffix is local to Pi.
+Fast mode now follows Pi's model selection and session restoration. There is no `/fast` command or separate per-model preference.
+Old preference files in `~/.pi/agent/extensions/pi-codex-fast/` are ignored and left untouched.
+
+## RPC
+
+The aliases are available through the normal model registry and RPC model selection when this extension is loaded:
+
+```json
+{"id":"fast","type":"set_model","provider":"openai-codex","modelId":"gpt-6.1-sol-fast"}
+```
+
+To disable fast mode, select `gpt-6.1-sol` instead.
+RPC clients receive the native status through `extension_ui_request` records with `method: "setStatus"`.
 
 ## Configure pi-footer
 
-Add a **Pi Event Value** widget in pi-footer and set **Widget ID** to `codex-fast`.
-Enable **Hide when empty** to hide the widget when fast mode is off.
-Hide the `pi-codex-fast` entry in pi-footer's extension status row to avoid a duplicate native indicator.
-In `pi-footer.json`, this means adding `pi-codex-fast` to `extensionStatusRow.hiddenKeys`.
+Add a **Pi Event Value** widget with **Widget ID** `codex-fast`.
+Enable **Hide when empty** and leave the icon option empty.
+The widget displays `⚡ fast` for a fast alias and nothing for normal models.
+
+Hide `pi-codex-fast` in pi-footer's extension status row to avoid a duplicate native indicator.
+In `pi-footer.json`, add it to `extensionStatusRow.hiddenKeys`.
 Publishing events does not automatically add a widget to your footer configuration.
+Existing `codex-fast` widgets continue to work without changes.
 
-The widget displays `⚡ fast`, matching the native status. Leave the widget's icon option empty because the value includes the lightning icon.
-The extension republishes its value after session changes, reload, model selection, and mode changes, and clears it on shutdown.
+Alternatively, use a **Pi Extension Status** widget with **Status key** `pi-codex-fast`.
 
-Alternatively, use a **Pi Extension Status** widget with **Status key** set to `pi-codex-fast`.
-Choose one integration to avoid duplicate indicators. The extension requires no pi-footer dependency.
+## Pricing and availability
 
-## Compatibility and usage
+Fast aliases advertise 2× base monetary rates for input, output, cache reads, cache writes, and context-dependent pricing tiers.
+Completed assistant messages are recalculated using those rates, replacing any provider multiplier rather than stacking on it.
+Pi's session totals and pi-footer's cost widget use these saved message costs. Existing history is unchanged.
 
-The extension allows all models on the `openai-codex` provider using `openai-codex-responses`, without filtering model names.
-Other providers, API-key providers, and virtual model selections are not supported.
-
-The provider check permits a priority request; it does not verify server-side eligibility.
-OpenAI may reject or ignore priority for individual models. See the [Codex speed documentation](https://developers.openai.com/codex/speed/) for availability.
-
-Fast mode sends `service_tier: "priority"`, matching the
-[Codex request mapping](https://github.com/openai/codex/blob/main/codex-rs/protocol/src/config_types.rs).
-Pi applies the payload hook before both HTTP and WebSocket requests.
-Disabled mode leaves the payload unchanged, including tiers configured elsewhere.
-
-OpenAI currently lists 2.5× included subscription usage and 2× purchased-credit or Enterprise pay-as-you-go rates for Fast mode.
-Availability depends on your plan, workspace, and rollout. A priority request does not guarantee priority service or a particular speed.
-The footer reports the requested mode, not the tier delivered by OpenAI.
+These are estimates for requested Fast mode, not confirmed charges or subscription-limit accounting.
+OpenAI currently lists 2.5× included subscription usage and 2× purchased-credit or Enterprise pay-as-you-go rates.
+The 2.5× included-usage multiplier is not applied to dollar costs.
+Eligibility depends on the model, account, and rollout; OpenAI can reject or ignore priority.
+An extension that overrides the request tier can also make estimates differ from actual billing.
 This extension does not enable Ultrafast.
 
-## Cost estimates
-
-For each fast-mode request, the extension records the model's base pricing at request time.
-When its assistant message finishes, it recalculates input, output, cache-read, and cache-write costs from Pi's token counts and multiplies them by 2.
-This replaces any provider-calculated multiplier rather than stacking on it.
-
-The adjusted costs are saved with the message and used by Pi's session totals and pi-footer's cost widget.
-Turning fast mode off or switching models during a request does not change that request's estimate.
-Standard requests and existing session history are left unchanged.
-
-These are monetary estimates for requested Fast mode, not confirmed charges or subscription-limit accounting.
-The 2.5× included-usage multiplier is not applied to dollar costs.
-Custom or zero registry prices remain the basis of the estimate.
-If OpenAI ignores priority, or another extension overrides the request tier, the estimate can differ from actual billing.
+See [Codex speed documentation](https://developers.openai.com/codex/speed/) and the
+[Codex priority request mapping](https://github.com/openai/codex/blob/main/codex-rs/protocol/src/config_types.rs).
 
 ## Verify changes
 
