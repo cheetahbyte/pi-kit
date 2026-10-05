@@ -28,7 +28,7 @@
       "./packages/*/src/index.ts",
       "./packages/pi-hot-compact/index.ts",
       "./node_modules/@cheetahbyte/pi-subagents/src/index.ts",
-      "./node_modules/pi-footer/src/index.ts"
+      "./node_modules/@cheetahbyte/pi-footer/src/index.ts"
     ],
     "skills": [
       "./node_modules/@cheetahbyte/pi-subagents/skills"
@@ -41,12 +41,12 @@
     "set-version": "node scripts/version.mjs"
   },
   "dependencies": {
-    "@cheetahbyte/pi-subagents": "^0.20.1",
-    "pi-footer": "^0.5.1"
+    "@cheetahbyte/pi-footer": "^0.5.2",
+    "@cheetahbyte/pi-subagents": "^0.21.0"
   },
   "bundledDependencies": [
-    "@cheetahbyte/pi-subagents",
-    "pi-footer"
+    "@cheetahbyte/pi-footer",
+    "@cheetahbyte/pi-subagents"
   ],
   "peerDependencies": {
     "@earendil-works/pi-ai": "*",

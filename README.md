@@ -43,7 +43,7 @@ The kit also bundles two packages that are maintained elsewhere:
 | Package | What it adds |
 | --- | --- |
 | [`@cheetahbyte/pi-subagents`](https://github.com/cheetahbyte/pi-subagents) | Subagents and workflows. |
-| [`pi-footer`](https://github.com/wobondar/pi-footer) | A configurable footer. |
+| [`@cheetahbyte/pi-footer`](https://github.com/cheetahbyte/pi-footer) | A configurable footer. |
 
 If you install the kit, remove these packages and any single kit package from your Pi settings. Otherwise Pi loads them twice.
 
