@@ -1,4 +1,4 @@
-import type { TaskStatus } from "../tool/types.js";
+import type { TaskStatus } from "../tool/types.ts";
 
 export const VALID_TRANSITIONS: Record<TaskStatus, ReadonlySet<TaskStatus>> = {
 	pending: new Set(["in_progress", "completed", "deleted"]),

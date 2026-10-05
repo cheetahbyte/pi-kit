@@ -1,7 +1,7 @@
 import { basename, extname, relative, sep } from "node:path";
 import { homedir } from "node:os";
 import { VERSION, type ExtensionAPI, type SourceInfo } from "@earendil-works/pi-coding-agent";
-import { installAgentSessionResourceCapture, loadedContextPaths } from "./context.js";
+import { installAgentSessionResourceCapture, loadedContextPaths } from "./context.ts";
 import { truncateToWidth, visibleWidth } from "@earendil-works/pi-tui";
 
 installAgentSessionResourceCapture();

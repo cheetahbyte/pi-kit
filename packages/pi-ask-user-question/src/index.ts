@@ -1,7 +1,7 @@
 import { defineTool, type ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { Text } from "@earendil-works/pi-tui";
-import { QuestionDialog } from "./dialog.js";
-import { parameters, Questionnaire, validate, type QuestionnaireResult } from "./questionnaire.js";
+import { QuestionDialog } from "./dialog.ts";
+import { parameters, Questionnaire, validate, type QuestionnaireResult } from "./questionnaire.ts";
 
 export const askUserQuestion = defineTool<typeof parameters, QuestionnaireResult>({
   name: "ask_user_question",

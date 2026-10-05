@@ -3,8 +3,8 @@ import {
 	TASK_STATUSES,
 	type Task,
 	type TaskDetails,
-} from "../tool/types.js";
-import { EMPTY_STATE, type TaskState } from "./state.js";
+} from "../tool/types.ts";
+import { EMPTY_STATE, type TaskState } from "./state.ts";
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
 	typeof value === "object" && value !== null;

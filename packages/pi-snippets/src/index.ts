@@ -3,7 +3,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { getAgentDir, type ExtensionAPI, type ExtensionContext } from "@earendil-works/pi-coding-agent";
 import { Key, matchesKey, truncateToWidth, wrapTextWithAnsi } from "@earendil-works/pi-tui";
-import { InvalidSnippetSettingsError, loadSnippetModes, loadSnippets, saveSnippetModes, type Snippet, type SnippetMode } from "./snippets.js";
+import { InvalidSnippetSettingsError, loadSnippetModes, loadSnippets, saveSnippetModes, type Snippet, type SnippetMode } from "./snippets.ts";
 
 const bundledSnippetsDirectory = join(dirname(fileURLToPath(import.meta.url)), "..", "snippets");
 const widgetId = "pi-snippets";

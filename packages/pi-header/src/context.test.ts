@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { AgentSession, type ResourceLoader } from "@earendil-works/pi-coding-agent";
-import { installAgentSessionResourceCapture, loadedContextPaths } from "./context.js";
+import { installAgentSessionResourceCapture, loadedContextPaths } from "./context.ts";
 
 type FakeSession = {
   resourceLoader: ResourceLoader;

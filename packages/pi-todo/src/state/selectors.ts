@@ -1,5 +1,5 @@
-import type { Task, TaskStatus } from "../tool/types.js";
-import type { TaskState } from "./state.js";
+import type { Task, TaskStatus } from "../tool/types.ts";
+import type { TaskState } from "./state.ts";
 
 export const selectVisibleTasks = (state: TaskState): Task[] =>
 	state.tasks.filter((task) => task.status !== "deleted");

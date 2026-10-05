@@ -1,8 +1,8 @@
 import { expect, test } from "bun:test";
 import type { ExtensionAPI, ExtensionToolContext } from "@earendil-works/pi-coding-agent";
-import extension, { askUserQuestion } from "./index.js";
-import type { QuestionnaireResult } from "./questionnaire.js";
-import { fixture } from "./questionnaire.test.js";
+import extension, { askUserQuestion } from "./index.ts";
+import type { QuestionnaireResult } from "./questionnaire.ts";
+import { fixture } from "./questionnaire.test.ts";
 
 test("extension registers the questionnaire tool", () => {
   const names: string[] = [];

@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { AgentSession, type ExtensionAPI, type ExtensionContext, type ResourceLoader } from "@earendil-works/pi-coding-agent";
-import headerExtension from "./index.js";
+import headerExtension from "./index.ts";
 
 type Header = { render(width: number): string[] };
 type HeaderFactory = (tui: unknown, theme: { bold(text: string): string; fg(color: string, text: string): string }) => Header;

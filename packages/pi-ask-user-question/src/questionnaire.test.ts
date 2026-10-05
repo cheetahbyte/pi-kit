@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { Value } from "typebox/value";
-import { parameters, Questionnaire, validate, type QuestionnaireParams } from "./questionnaire.js";
+import { parameters, Questionnaire, validate, type QuestionnaireParams } from "./questionnaire.ts";
 
 export function fixture(finalQuestion?: string): QuestionnaireParams {
   return {

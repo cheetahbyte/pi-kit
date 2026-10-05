@@ -1,5 +1,5 @@
-import { htmlToMarkdown } from "./markdown.js";
-import { userAgent } from "./search.js";
+import { htmlToMarkdown } from "./markdown.ts";
+import { userAgent } from "./search.ts";
 
 export type Page = { url: string; title: string; text: string };
 

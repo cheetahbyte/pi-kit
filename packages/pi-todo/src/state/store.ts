@@ -1,5 +1,5 @@
-import type { Task } from "../tool/types.js";
-import { EMPTY_STATE, type TaskState } from "./state.js";
+import type { Task } from "../tool/types.ts";
+import { EMPTY_STATE, type TaskState } from "./state.ts";
 
 const sessions = new Map<string, TaskState>();
 

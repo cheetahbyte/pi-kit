@@ -1,7 +1,7 @@
 import type { KeybindingsManager, Theme } from "@earendil-works/pi-coding-agent";
 import { getMarkdownTheme } from "@earendil-works/pi-coding-agent";
 import { CURSOR_MARKER, Editor, Markdown, matchesKey, truncateToWidth, visibleWidth, wrapTextWithAnsi, type Component, type Focusable, type TUI } from "@earendil-works/pi-tui";
-import { Questionnaire, type QuestionnaireResult } from "./questionnaire.js";
+import { Questionnaire, type QuestionnaireResult } from "./questionnaire.ts";
 
 export class QuestionDialog implements Component, Focusable {
   private hasFocus = false;

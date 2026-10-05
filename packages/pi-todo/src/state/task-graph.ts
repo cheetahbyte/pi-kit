@@ -1,4 +1,4 @@
-import type { Task } from "../tool/types.js";
+import type { Task } from "../tool/types.ts";
 
 export function detectCycle(
 	taskList: readonly Task[],

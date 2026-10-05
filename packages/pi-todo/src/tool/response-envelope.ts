@@ -1,6 +1,6 @@
-import type { TaskState } from "../state/state.js";
-import type { Op } from "../state/state-reducer.js";
-import type { TaskAction, TaskDetails, TodoParams } from "./types.js";
+import type { TaskState } from "../state/state.ts";
+import type { Op } from "../state/state-reducer.ts";
+import type { TaskAction, TaskDetails, TodoParams } from "./types.ts";
 
 function formatContent(op: Op): string {
 	switch (op.kind) {

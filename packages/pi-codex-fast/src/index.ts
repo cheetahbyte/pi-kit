@@ -1,7 +1,7 @@
 import { calculateCost } from "@earendil-works/pi-ai";
 import { builtinProviders } from "@earendil-works/pi-ai/providers/all";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
-import { createFastProvider } from "./provider.js";
+import { createFastProvider } from "./provider.ts";
 
 export default function (pi: ExtensionAPI): void {
   const base = builtinProviders().find(provider => provider.id === "openai-codex");

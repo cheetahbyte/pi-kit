@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { CONFIG_DIR_NAME, getAgentDir, type ExtensionAPI, type ExtensionContext } from "@earendil-works/pi-coding-agent";
-import { fromClaudeInput, interpret, loadConfig, matches, matchesIf, run, toClaudeInput, toClaudeTool, type Config, type HookEvent, type Outcome } from "./hooks.js";
+import { fromClaudeInput, interpret, loadConfig, matches, matchesIf, run, toClaudeInput, toClaudeTool, type Config, type HookEvent, type Outcome } from "./hooks.ts";
 
 const customType = "pi-hooks";
 const defaultTimeout = 600;

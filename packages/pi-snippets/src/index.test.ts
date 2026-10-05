@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import type { ExtensionAPI, ExtensionContext, InputEvent, InputEventResult, SessionEntry, SessionStartEvent } from "@earendil-works/pi-coding-agent";
 import { visibleWidth } from "@earendil-works/pi-tui";
-import snippetsExtension from "./index.js";
+import snippetsExtension from "./index.ts";
 
 const directories: string[] = [];
 afterEach(() => {

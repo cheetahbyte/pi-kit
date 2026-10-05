@@ -1,9 +1,9 @@
 import { expect, test } from "bun:test";
 import { initTheme, Theme } from "@earendil-works/pi-coding-agent";
 import { CURSOR_MARKER, KeybindingsManager, TUI_KEYBINDINGS, TuiMainScreen, visibleWidth, type Terminal } from "@earendil-works/pi-tui";
-import { QuestionDialog } from "./dialog.js";
-import { Questionnaire, type QuestionnaireResult } from "./questionnaire.js";
-import { fixture } from "./questionnaire.test.js";
+import { QuestionDialog } from "./dialog.ts";
+import { Questionnaire, type QuestionnaireResult } from "./questionnaire.ts";
+import { fixture } from "./questionnaire.test.ts";
 
 initTheme("dark", false);
 const theme = new Theme(

@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { loadSnippetModes, loadSnippets, parseSnippet, saveSnippetModes, type SnippetMode } from "./snippets.js";
+import { loadSnippetModes, loadSnippets, parseSnippet, saveSnippetModes, type SnippetMode } from "./snippets.ts";
 
 test("persists only automatic modes and refuses to overwrite invalid settings", () => {
   const directory = mkdtempSync(join(tmpdir(), "pi-snippets-"));

@@ -2,7 +2,7 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 import { getAgentDir, type ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { Key, matchesKey, truncateToWidth } from "@earendil-works/pi-tui";
-import { aggregate, scan, type Stats, type Table } from "./stats.js";
+import { aggregate, scan, type Stats, type Table } from "./stats.ts";
 
 const defaultDays = 30;
 const tabs = ["Overview", "Models", "Projects", "Tools", "Skills"] as const;

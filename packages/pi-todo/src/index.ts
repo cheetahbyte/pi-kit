@@ -1,7 +1,7 @@
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
-import { replayFromBranch } from "./state/replay.js";
-import { evictSession, replaceState, sid } from "./state/store.js";
-import { registerTodosCommand, registerTodoTool } from "./todo.js";
+import { replayFromBranch } from "./state/replay.ts";
+import { evictSession, replaceState, sid } from "./state/store.ts";
+import { registerTodosCommand, registerTodoTool } from "./todo.ts";
 
 const isStaleContext = (error: unknown): boolean =>
 	/stale after session replacement/.test(String(error));

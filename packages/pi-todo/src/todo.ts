@@ -3,13 +3,13 @@ import {
 	selectTasksByStatus,
 	selectTodoCounts,
 	selectVisibleTasks,
-} from "./state/selectors.js";
-import { applyTaskMutation } from "./state/state-reducer.js";
-import { commitState, getState, sid } from "./state/store.js";
-import { buildToolResult } from "./tool/response-envelope.js";
-import { COMMAND_NAME, TOOL_NAME, TodoParamsSchema } from "./tool/types.js";
+} from "./state/selectors.ts";
+import { applyTaskMutation } from "./state/state-reducer.ts";
+import { commitState, getState, sid } from "./state/store.ts";
+import { buildToolResult } from "./tool/response-envelope.ts";
+import { COMMAND_NAME, TOOL_NAME, TodoParamsSchema } from "./tool/types.ts";
 
-export { TOOL_NAME } from "./tool/types.js";
+export { TOOL_NAME } from "./tool/types.ts";
 
 export function registerTodoTool(pi: ExtensionAPI): void {
 	pi.registerTool({

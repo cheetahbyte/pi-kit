@@ -18,7 +18,7 @@ export default function (pi: ExtensionAPI): void {
       numResults: Type.Optional(Type.Integer({ minimum: 1, maximum: maxResults, description: `Results per query. Default ${defaultResults}.` })),
     }),
     async execute(_id, params, signal) {
-      const { search } = await import("./search.js");
+      const { search } = await import("./search.ts");
       const sections = await Promise.all(
         params.queries.map(async (query) => {
           try {
@@ -46,7 +46,7 @@ export default function (pi: ExtensionAPI): void {
     async execute(_id, params, signal) {
       const urls = [...(params.url ? [params.url] : []), ...(params.urls ?? [])];
       if (!urls.length) throw new Error("Pass url or urls.");
-      const { fetchPage } = await import("./fetch.js");
+      const { fetchPage } = await import("./fetch.ts");
       const start = (params.offset ?? 1) - 1;
       const limits = { maxLines: Math.floor(DEFAULT_MAX_LINES / urls.length), maxBytes: Math.floor(DEFAULT_MAX_BYTES / urls.length) };
       const sections = await Promise.all(

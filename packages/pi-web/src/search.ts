@@ -1,4 +1,4 @@
-import { decodeEntities, stripTags } from "./markdown.js";
+import { decodeEntities, stripTags } from "./markdown.ts";
 
 export type SearchResult = { title: string; url: string; snippet: string };
 
