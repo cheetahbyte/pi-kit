@@ -68,19 +68,6 @@
         "typebox": "*",
       },
     },
-    "packages/pi-codex-fast": {
-      "name": "@cheetahbyte/pi-codex-fast",
-      "version": "0.3.0",
-      "devDependencies": {
-        "@earendil-works/pi-ai": "^1.0.2",
-        "@earendil-works/pi-coding-agent": "^1.0.2",
-        "typescript": "^7",
-      },
-      "peerDependencies": {
-        "@earendil-works/pi-ai": "*",
-        "@earendil-works/pi-coding-agent": "*",
-      },
-    },
     "packages/pi-context": {
       "name": "@cheetahbyte/pi-context",
       "version": "0.3.0",
@@ -252,8 +239,6 @@
     "@cheetahbyte/pi-btw": ["@cheetahbyte/pi-btw@workspace:packages/pi-btw"],
 
     "@cheetahbyte/pi-claude-code": ["@cheetahbyte/pi-claude-code@workspace:packages/pi-claude-code"],
-
-    "@cheetahbyte/pi-codex-fast": ["@cheetahbyte/pi-codex-fast@workspace:packages/pi-codex-fast"],
 
     "@cheetahbyte/pi-context": ["@cheetahbyte/pi-context@workspace:packages/pi-context"],
 
