@@ -21,7 +21,9 @@ import {
   type SimpleStreamOptions,
   type StopReason,
   type TextContent,
+  type ThinkingBudgets,
   type ThinkingContent,
+  type ThinkingLevel,
   type ToolCall,
   type TranscriptContext,
   collapseSystemMessages,
@@ -30,7 +32,6 @@ import {
   getCurrentTools,
   parseStreamingJson,
 } from "@earendil-works/pi-ai";
-import { adjustMaxTokensForThinking } from "@earendil-works/pi-ai/api/simple-options";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
 type Json = Record<string, any>;
@@ -52,6 +53,9 @@ const MODELS: [string, string, number, number][] = [
 // The API 400s a thinking disable on these; Haiku 4.5 400s adaptive thinking.
 const MANDATORY_THINKING = ["claude-fable", "claude-opus-5-5", "claude-sonnet-5-5"];
 const NO_ADAPTIVE_THINKING = new Set(["claude-haiku-4-5-20251001"]);
+// pi-ai's defaults; its budget helper lives on a subpath Pi's extension loader can't resolve.
+const THINKING_BUDGETS: Required<ThinkingBudgets> = { minimal: 1024, low: 2048, medium: 8192, high: 16384 };
+const MIN_ANSWER_TOKENS = 1024;
 // Never let the child bill an API key or talk to another backend; the relay owns the base URL.
 export const STRIPPED_ENV = [
   "ANTHROPIC_API_KEY",
@@ -288,6 +292,14 @@ class Relay {
   }
 }
 
+function budgetThinking(model: Model<Api>, level: ThinkingLevel, options: SimpleStreamOptions | undefined) {
+  const budgets = { ...THINKING_BUDGETS, ...options?.thinkingBudgets };
+  let budget = budgets[level === "xhigh" || level === "max" ? "high" : level];
+  const maxTokens = options?.maxTokens === undefined ? model.maxTokens : Math.min(options.maxTokens + budget, model.maxTokens);
+  if (maxTokens <= budget) budget = Math.max(0, maxTokens - MIN_ANSWER_TOKENS);
+  return { maxTokens, thinkingBudget: budget };
+}
+
 export function requestBody(model: Model<Api>, options: SimpleStreamOptions | undefined, tools: Json[]): Json {
   const body: Json = { tools };
   const level = options?.reasoning;
@@ -297,7 +309,7 @@ export function requestBody(model: Model<Api>, options: SimpleStreamOptions | un
     if (body.thinking) body.context_management = { edits: [] };
   } else if (NO_ADAPTIVE_THINKING.has(model.id)) {
     // No effort support here: native drops output_config.effort and sends a fixed budget for every level.
-    const { maxTokens, thinkingBudget } = adjustMaxTokensForThinking(options?.maxTokens, model.maxTokens, level, options?.thinkingBudgets);
+    const { maxTokens, thinkingBudget } = budgetThinking(model, level, options);
     body.thinking = { type: "enabled", budget_tokens: thinkingBudget };
     body.max_tokens = maxTokens;
     return body;
