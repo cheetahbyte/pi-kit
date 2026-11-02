@@ -1,7 +1,7 @@
 import { defineTool, type ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { Text } from "@earendil-works/pi-tui";
 import { QuestionDialog } from "./dialog.ts";
-import { parameters, Questionnaire, validate, type QuestionnaireResult } from "./questionnaire.ts";
+import { parameters, Questionnaire, validate, type QuestionnaireParams, type QuestionnaireResult } from "./questionnaire.ts";
 
 export const askUserQuestion = defineTool<typeof parameters, QuestionnaireResult>({
   name: "ask_user_question",
@@ -9,7 +9,7 @@ export const askUserQuestion = defineTool<typeof parameters, QuestionnaireResult
   description: "Ask 1–4 structured questions in a tabbed questionnaire. Each question needs 2–4 options with descriptions. A custom-answer row is appended automatically: do not author Other, Type something., or Next. Use multiSelect for multiple choices. Single-select options can include Markdown previews. Put recommended choices first and label them (Recommended). Optionally supply finalQuestion to ask for additional context or notes in a separate, skippable Notes tab before the final review. Omit finalQuestion when no extra context is needed. Esc cancels without submitting answers.",
   executionMode: "sequential",
   parameters,
-  async execute(_id, params, signal, _onUpdate, ctx) {
+  async execute(_id, params: QuestionnaireParams, signal, _onUpdate, ctx) {
     validate(params);
     if (ctx.mode !== "tui") throw new Error("ask_user_question requires an interactive terminal. Ask the user in chat instead.");
     const state = new Questionnaire(params);
@@ -21,7 +21,8 @@ export const askUserQuestion = defineTool<typeof parameters, QuestionnaireResult
     });
     return response(result);
   },
-  renderCall(args, theme) {
+  renderCall(input, theme) {
+    const args = input as QuestionnaireParams;
     return new Text(theme.fg("toolTitle", theme.bold("Ask user question")) + theme.fg("muted", ` · ${args.questions?.length ?? 0} questions${args.finalQuestion ? " + notes" : ""}`), 0, 0);
   },
   renderResult(result, _options, theme) {

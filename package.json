@@ -1,7 +1,7 @@
 {
   "name": "@cheetahbyte/pi-kit",
   "version": "0.3.0",
-  "description": "A batteries-included set of Pi extensions: subagents, hot compaction, todo, hooks, stats, footer, header, web search, and more.",
+  "description": "A batteries-included set of Pi extensions: subagents, todo, hooks, stats, footer, header, web search, and more.",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -15,7 +15,6 @@
     "packages/*"
   ],
   "files": [
-    "packages/*/index.ts",
     "packages/*/src",
     "packages/*/snippets",
     "!**/*.test.ts"
@@ -26,7 +25,6 @@
   "pi": {
     "extensions": [
       "./packages/*/src/index.ts",
-      "./packages/pi-hot-compact/index.ts",
       "./node_modules/@cheetahbyte/pi-subagents/src/index.ts",
       "./node_modules/@cheetahbyte/pi-footer/src/index.ts"
     ],
@@ -42,7 +40,8 @@
   },
   "dependencies": {
     "@cheetahbyte/pi-footer": "^0.5.2",
-    "@cheetahbyte/pi-subagents": "^0.21.0"
+    "@cheetahbyte/pi-subagents": "^0.21.0",
+    "@earendil-works/pi-schema": "^1.5.0"
   },
   "bundledDependencies": [
     "@cheetahbyte/pi-footer",
@@ -50,9 +49,8 @@
   ],
   "peerDependencies": {
     "@earendil-works/pi-ai": "*",
-    "@earendil-works/pi-coding-agent": "*",
-    "@earendil-works/pi-tui": "*",
-    "typebox": "*"
+    "@earendil-works/pi-coding-agent": ">=1.5.0",
+    "@earendil-works/pi-tui": "*"
   },
   "devDependencies": {
     "@types/bun": "^1",

@@ -1,8 +1,19 @@
 import { DEFAULT_MAX_BYTES, DEFAULT_MAX_LINES, truncateHead, type ExtensionAPI } from "@earendil-works/pi-coding-agent";
-import { Type } from "typebox";
+import { arr, int, obj, opt, str, type Static } from "@earendil-works/pi-schema";
 
 const defaultResults = 8;
 const maxResults = 20;
+
+const searchParameters = obj({
+  queries: arr(str(), { minItems: 1, description: "One or more search queries." }),
+  numResults: opt(int({ minimum: 1, maximum: maxResults, description: `Results per query. Default ${defaultResults}.` })),
+}, { open: true });
+
+const fetchParameters = obj({
+  url: opt(str({ description: "A single URL." })),
+  urls: opt(arr(str(), { description: "Several URLs to fetch at once." })),
+  offset: opt(int({ minimum: 1, description: "Line number to start from when continuing a truncated page." })),
+}, { open: true });
 
 const text = (value: string) => ({ content: [{ type: "text" as const, text: value }], details: undefined });
 const failure = (subject: string, error: unknown): string => `${subject}: ${error instanceof Error ? error.message : String(error)}`;
@@ -13,11 +24,8 @@ export default function (pi: ExtensionAPI): void {
     name: "web_search",
     label: "Web search",
     description: "Search the web with DuckDuckGo. Returns a title, URL, and snippet for each result. Pass several queries to search different angles at once. Use fetch_content to read a result.",
-    parameters: Type.Object({
-      queries: Type.Array(Type.String(), { minItems: 1, description: "One or more search queries." }),
-      numResults: Type.Optional(Type.Integer({ minimum: 1, maximum: maxResults, description: `Results per query. Default ${defaultResults}.` })),
-    }),
-    async execute(_id, params, signal) {
+    parameters: searchParameters,
+    async execute(_id, params: Static<typeof searchParameters>, signal) {
       const { search } = await import("./search.ts");
       const sections = await Promise.all(
         params.queries.map(async (query) => {
@@ -38,12 +46,8 @@ export default function (pi: ExtensionAPI): void {
     name: "fetch_content",
     label: "Fetch content",
     description: "Fetch one or more web pages and return them as Markdown. GitHub repository, file, issue, and pull request URLs are supported. Long pages are truncated: pass offset to continue reading from a line number.",
-    parameters: Type.Object({
-      url: Type.Optional(Type.String({ description: "A single URL." })),
-      urls: Type.Optional(Type.Array(Type.String(), { description: "Several URLs to fetch at once." })),
-      offset: Type.Optional(Type.Integer({ minimum: 1, description: "Line number to start from when continuing a truncated page." })),
-    }),
-    async execute(_id, params, signal) {
+    parameters: fetchParameters,
+    async execute(_id, params: Static<typeof fetchParameters>, signal) {
       const urls = [...(params.url ? [params.url] : []), ...(params.urls ?? [])];
       if (!urls.length) throw new Error("Pass url or urls.");
       const { fetchPage } = await import("./fetch.ts");

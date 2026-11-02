@@ -1,23 +1,23 @@
-import { Type, type Static } from "typebox";
+import { arr, bool, obj, opt, str, type Static } from "@earendil-works/pi-schema";
 
-const option = Type.Object({
-  label: Type.String({ minLength: 1, maxLength: 60 }),
-  description: Type.String({ minLength: 1 }),
-  preview: Type.Optional(Type.String({ description: "Markdown artifact to compare; single-select questions only." })),
-});
+const option = obj({
+  label: str({ minLength: 1, maxLength: 60 }),
+  description: str({ minLength: 1 }),
+  preview: opt(str({ description: "Markdown artifact to compare; single-select questions only." })),
+}, { open: true });
 
-export const parameters = Type.Object({
-  questions: Type.Array(Type.Object({
-    question: Type.String({ minLength: 1 }),
-    header: Type.String({ minLength: 1, maxLength: 16 }),
-    options: Type.Array(option, { minItems: 2, maxItems: 4 }),
-    multiSelect: Type.Optional(Type.Boolean()),
-  }), { minItems: 1, maxItems: 4 }),
-  finalQuestion: Type.Optional(Type.String({
+export const parameters = obj({
+  questions: arr(obj({
+    question: str({ minLength: 1 }),
+    header: str({ minLength: 1, maxLength: 16 }),
+    options: arr(option, { minItems: 2, maxItems: 4 }),
+    multiSelect: opt(bool()),
+  }, { open: true }), { minItems: 1, maxItems: 4 }),
+  finalQuestion: opt(str({
     minLength: 1,
     description: "Optional open-ended prompt for a separate Notes tab after all questions and before Submit. Ask for additional context, constraints, or notes. The user can leave it blank. Omit when unnecessary.",
   })),
-});
+}, { open: true });
 
 export type QuestionnaireParams = Static<typeof parameters>;
 export type Question = QuestionnaireParams["questions"][number];

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { Value } from "typebox/value";
+import { compile } from "@earendil-works/pi-schema";
 import { parameters, Questionnaire, validate, type QuestionnaireParams } from "./questionnaire.ts";
 
 export function fixture(finalQuestion?: string): QuestionnaireParams {
@@ -65,8 +65,9 @@ describe("questionnaire", () => {
 
 describe("validation", () => {
   test("schema enforces question, option, header, and label limits", () => {
-    expect(Value.Check(parameters, fixture())).toBe(true);
-    expect(Value.Check(parameters, { questions: [] })).toBe(false);
+    const schema = compile(parameters);
+    expect(schema.check(fixture())).toBe(true);
+    expect(schema.check({ questions: [] })).toBe(false);
     for (const edit of [
       (p: QuestionnaireParams) => { p.questions = Array.from({ length: 5 }, () => p.questions[0]); },
       (p: QuestionnaireParams) => { p.questions[0].header = "x".repeat(17); },
@@ -74,7 +75,7 @@ describe("validation", () => {
       (p: QuestionnaireParams) => { p.questions[0].options.pop(); },
     ]) {
       const params = fixture(); edit(params);
-      expect(Value.Check(parameters, params)).toBe(false);
+      expect(schema.check(params)).toBe(false);
     }
   });
   test("rejects reserved labels, duplicate labels, blank prompt, and multi previews", () => {

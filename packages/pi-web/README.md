@@ -1,6 +1,6 @@
 # Pi web
 
-`@cheetahbyte/pi-web` gives the agent two tools: `web_search` and `fetch_content`. It needs no API key and has no runtime dependencies. The search and fetch code loads on first use, so the extension adds almost nothing to Pi's startup time.
+`@cheetahbyte/pi-web` gives the agent two tools: `web_search` and `fetch_content`. It needs no API key. Tool schemas use `@earendil-works/pi-schema`. The search and fetch code loads on first use, so the extension adds almost nothing to Pi's startup time.
 
 ## Install
 

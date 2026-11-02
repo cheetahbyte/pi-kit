@@ -4,7 +4,9 @@ A set of extensions for the [Pi coding agent](https://github.com/earendil-works/
 
 ## Requirements
 
-Pi 1.0.2 or newer. This applies to the kit and to every package in it.
+The kit requires Pi 1.5.0 or newer. The `pi-ask-user-question`, `pi-todo`, and `pi-web` packages require the same version. Other standalone packages require Pi 1.0.2 or newer.
+
+Tool parameter schemas use `@earendil-works/pi-schema` builders and types instead of TypeBox.
 
 ## Install the kit
 
@@ -30,7 +32,6 @@ Each package in `packages/` is also published on its own. Install one with `pi i
 | `@cheetahbyte/pi-context` | `/context` shows what fills the context window. |
 | `@cheetahbyte/pi-header` | A compact header with prompts, skills, extensions, and context. |
 | `@cheetahbyte/pi-hooks` | Claude Code-style command hooks from `~/.pi/agent/hooks.json` and `.pi/hooks.json`. |
-| `pi-hot-compact` | Background compaction and recall of omitted history. |
 | `@cheetahbyte/pi-snippets` | Reusable text before or after your messages. |
 | `@cheetahbyte/pi-sticky-model` | Remembers the model you switch to and the thinking level for each model. |
 | `@cheetahbyte/pi-stats` | `/stats` shows cost, token, model, project, tool, and skill usage. |

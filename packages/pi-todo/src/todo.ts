@@ -7,7 +7,7 @@ import {
 import { applyTaskMutation } from "./state/state-reducer.ts";
 import { commitState, getState, sid } from "./state/store.ts";
 import { buildToolResult } from "./tool/response-envelope.ts";
-import { COMMAND_NAME, TOOL_NAME, TodoParamsSchema } from "./tool/types.ts";
+import { COMMAND_NAME, TOOL_NAME, TodoParamsSchema, type TodoParams } from "./tool/types.ts";
 
 export { TOOL_NAME } from "./tool/types.ts";
 
@@ -17,7 +17,7 @@ export function registerTodoTool(pi: ExtensionAPI): void {
 		label: "Todo",
 		description: "Manage a task list to track multi-step progress.",
 		parameters: TodoParamsSchema,
-		async execute(_toolCallId, params, _signal, _onUpdate, ctx) {
+		async execute(_toolCallId, params: TodoParams, _signal, _onUpdate, ctx) {
 			const sessionId = sid(ctx);
 			const result = applyTaskMutation(
 				getState(sessionId),

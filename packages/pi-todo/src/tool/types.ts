@@ -1,4 +1,4 @@
-import { Type, type Static } from "typebox";
+import { arr, bool, int, map, obj, oneOf, opt, str, unknown, type Static } from "@earendil-works/pi-schema";
 
 export const TOOL_NAME = "todo";
 export const COMMAND_NAME = "todos";
@@ -49,33 +49,31 @@ export interface TaskDetails {
 	error?: string;
 }
 
-export const TodoParamsSchema = Type.Object({
-	action: Type.Union(TASK_ACTIONS.map((value) => Type.Literal(value))),
-	subject: Type.Optional(Type.String()),
-	description: Type.Optional(Type.String()),
-	activeForm: Type.Optional(Type.String()),
-	status: Type.Optional(
-		Type.Union(TASK_STATUSES.map((value) => Type.Literal(value))),
-	),
-	blockedBy: Type.Optional(Type.Array(Type.Integer())),
-	addBlockedBy: Type.Optional(Type.Array(Type.Integer())),
-	removeBlockedBy: Type.Optional(Type.Array(Type.Integer())),
-	owner: Type.Optional(Type.String()),
-	metadata: Type.Optional(Type.Record(Type.String(), Type.Unknown())),
-	id: Type.Optional(Type.Integer()),
-	includeDeleted: Type.Optional(Type.Boolean()),
-	tasks: Type.Optional(
-		Type.Array(
-			Type.Object({
-				subject: Type.String(),
-				description: Type.Optional(Type.String()),
-				activeForm: Type.Optional(Type.String()),
-				blockedBy: Type.Optional(Type.Array(Type.Integer())),
-				owner: Type.Optional(Type.String()),
-				metadata: Type.Optional(Type.Record(Type.String(), Type.Unknown())),
-			}),
+export const TodoParamsSchema = obj({
+	action: oneOf(TASK_ACTIONS),
+	subject: opt(str()),
+	description: opt(str()),
+	activeForm: opt(str()),
+	status: opt(oneOf(TASK_STATUSES)),
+	blockedBy: opt(arr(int())),
+	addBlockedBy: opt(arr(int())),
+	removeBlockedBy: opt(arr(int())),
+	owner: opt(str()),
+	metadata: opt(map(unknown())),
+	id: opt(int()),
+	includeDeleted: opt(bool()),
+	tasks: opt(
+		arr(
+			obj({
+				subject: str(),
+				description: opt(str()),
+				activeForm: opt(str()),
+				blockedBy: opt(arr(int())),
+				owner: opt(str()),
+				metadata: opt(map(unknown())),
+			}, { open: true }),
 		),
 	),
-});
+}, { open: true });
 
 export type TodoParams = Static<typeof TodoParamsSchema>;
