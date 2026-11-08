@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Remove the `claude-usage` status from `pi-claude-code`; `/claude-usage` still lists the plan limits.
 - Replace TypeBox schemas and validation tests with `@earendil-works/pi-schema` in the questionnaire, todo, and web packages.
 - Remove the `pi-hot-compact` package and its kit registration.
 - Preserve existing parameter constraints and support for extra object properties.

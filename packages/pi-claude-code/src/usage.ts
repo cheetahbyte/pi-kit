@@ -5,17 +5,15 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createInterface } from "node:readline";
-import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
-import { findClaude, killTree, PROVIDER, STRIPPED_ENV } from "./provider.ts";
+import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+import { findClaude, killTree, STRIPPED_ENV } from "./provider.ts";
 
 type Row = Record<string, unknown>;
 export type UsageWindow = { label: string; percent: number; resetsAt?: Date };
 export type UsageResult = { windows: UsageWindow[]; reason?: undefined } | { windows?: undefined; reason: string };
 
-const STATUS_KEY = "claude-usage";
 const REQUEST_ID = "pi-usage";
 const TIMEOUT_MS = 10_000;
-const REFRESH_MS = 60_000;
 const LABELS: Record<string, string> = { session: "Session", weekly_all: "Week" };
 // Older responses carry only top-level windows, without `limits`.
 const LEGACY: [string, string][] = [
@@ -106,41 +104,7 @@ export async function fetchUsage(): Promise<UsageResult> {
 const formatReset = (at: Date): string =>
   at.toLocaleString(undefined, { weekday: "short", hour: "2-digit", minute: "2-digit" });
 
-export const formatStatus = (windows: UsageWindow[]): string | undefined => {
-  const shown = windows.filter((window) => window.label === "Session" || window.label === "Week");
-  return shown.length ? shown.map((window) => `${window.label.toLowerCase()} ${Math.round(window.percent)}%`).join(" · ") : undefined;
-};
-
 export function registerUsage(pi: ExtensionAPI): void {
-  let fetchedAt = 0;
-  let pending: Promise<void> | undefined;
-
-  const refresh = (ctx: ExtensionContext, force = false): Promise<void> | undefined => {
-    if (pending || (!force && Date.now() - fetchedAt < REFRESH_MS)) return pending;
-    fetchedAt = Date.now();
-    pending = fetchUsage()
-      .then((result) => {
-        if (result.windows && ctx.model?.provider === PROVIDER) ctx.ui.setStatus(STATUS_KEY, formatStatus(result.windows));
-      })
-      .finally(() => {
-        pending = undefined;
-      });
-    return pending;
-  };
-
-  pi.on("session_start", (_event, ctx) => {
-    if (ctx.model?.provider === PROVIDER) void refresh(ctx);
-  });
-
-  pi.on("agent_end", (_event, ctx) => {
-    if (ctx.model?.provider === PROVIDER) void refresh(ctx);
-  });
-
-  pi.on("model_select", (event, ctx) => {
-    if (event.model.provider === PROVIDER) void refresh(ctx, true);
-    else ctx.ui.setStatus(STATUS_KEY, undefined);
-  });
-
   pi.registerCommand("claude-usage", {
     description: "Show Claude subscription plan limits",
     handler: async (_args, ctx) => {

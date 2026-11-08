@@ -49,8 +49,6 @@ Message costs show as zero because the subscription covers them. Whether a model
 
 Run `/claude-usage` to see your session and weekly limits, including model-specific limits, with their reset times.
 
-While a `claude-sub` model is selected, the extension also publishes a short status such as `session 8% · week 6%` under the status key `claude-usage`. It refreshes when a session starts, when you switch to a `claude-sub` model, and after each agent run, at most once a minute. To show it in pi-footer, add a `Pi Extension Status` widget with status key `claude-usage`.
-
 The limits come from Claude Code's own `get_usage` request, so they use the CLI's login and make no model request. A Claude Code version without `get_usage` reports that no usage answer was given; run `claude update`.
 
 ## How requests work
