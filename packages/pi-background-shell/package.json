@@ -1,0 +1,40 @@
+{
+  "name": "@cheetahbyte/pi-background-shell",
+  "version": "0.3.0",
+  "description": "Pi extension that runs long shell commands in the background and tells the agent when they exit.",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cheetahbyte/pi-kit.git",
+    "directory": "packages/pi-background-shell"
+  },
+  "keywords": [
+    "pi-package",
+    "pi-extension"
+  ],
+  "files": [
+    "src"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@earendil-works/pi-schema": "^1.5.0"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": ">=1.5.0",
+    "@earendil-works/pi-tui": "*"
+  },
+  "pi": {
+    "extensions": [
+      "./src/index.ts"
+    ]
+  },
+  "devDependencies": {
+    "@earendil-works/pi-coding-agent": "^1.5.0",
+    "@earendil-works/pi-tui": "^1.0.2",
+    "@types/node": "^22",
+    "typescript": "^7"
+  }
+}

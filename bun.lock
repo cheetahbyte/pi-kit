@@ -36,6 +36,23 @@
         "@earendil-works/pi-tui": "*",
       },
     },
+    "packages/pi-background-shell": {
+      "name": "@cheetahbyte/pi-background-shell",
+      "version": "0.3.0",
+      "dependencies": {
+        "@earendil-works/pi-schema": "^1.5.0",
+      },
+      "devDependencies": {
+        "@earendil-works/pi-coding-agent": "^1.5.0",
+        "@earendil-works/pi-tui": "^1.0.2",
+        "@types/node": "^22",
+        "typescript": "^7",
+      },
+      "peerDependencies": {
+        "@earendil-works/pi-coding-agent": ">=1.5.0",
+        "@earendil-works/pi-tui": "*",
+      },
+    },
     "packages/pi-btw": {
       "name": "@cheetahbyte/pi-btw",
       "version": "0.3.0",
@@ -220,6 +237,8 @@
     "@babel/runtime": ["@babel/runtime@7.29.7", "", {}, "sha512-Nq8OhGWiZIZGV6hLHoyAKLLcJihP/xFeBMGJoUrxTX2psI8dCifzLhZISFb+VWS3wFMRDmCGw5R+dOySCqPLhw=="],
 
     "@cheetahbyte/pi-ask-user-question": ["@cheetahbyte/pi-ask-user-question@workspace:packages/pi-ask-user-question"],
+
+    "@cheetahbyte/pi-background-shell": ["@cheetahbyte/pi-background-shell@workspace:packages/pi-background-shell"],
 
     "@cheetahbyte/pi-btw": ["@cheetahbyte/pi-btw@workspace:packages/pi-btw"],
 
