@@ -38,14 +38,13 @@ Each package in `packages/` is also published on its own. Install one with `pi i
 | `@cheetahbyte/pi-todo` | A todo tool with a task graph and `/todos`. |
 | `@cheetahbyte/pi-web` | Web search and page fetching without an API key. |
 
-The kit also bundles two packages that are maintained elsewhere:
+The kit also bundles a package that is maintained elsewhere:
 
 | Package | What it adds |
 | --- | --- |
-| [`@cheetahbyte/pi-subagents`](https://github.com/cheetahbyte/pi-subagents) | Subagents and workflows. |
 | [`@cheetahbyte/pi-footer`](https://github.com/cheetahbyte/pi-footer) | A configurable footer. |
 
-If you install the kit, remove these packages and any single kit package from your Pi settings. Otherwise Pi loads them twice.
+If you install the kit, remove this package and any single kit package from your Pi settings. Otherwise Pi loads them twice.
 
 `@cheetahbyte/pi-web` registers the same tool names as [`pi-web-access`](https://github.com/nicobailon/pi-web-access), so remove that package too. Keep it instead of the kit's web tools only if you need its PDF or video support, and then disable the `pi-web` extension with `pi config`.
 

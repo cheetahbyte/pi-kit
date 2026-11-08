@@ -1,7 +1,7 @@
 {
   "name": "@cheetahbyte/pi-kit",
   "version": "0.3.0",
-  "description": "A batteries-included set of Pi extensions: subagents, todo, hooks, stats, footer, header, web search, and more.",
+  "description": "A batteries-included set of Pi extensions: todo, hooks, stats, footer, header, web search, and more.",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -25,11 +25,7 @@
   "pi": {
     "extensions": [
       "./packages/*/src/index.ts",
-      "./node_modules/@cheetahbyte/pi-subagents/src/index.ts",
       "./node_modules/@cheetahbyte/pi-footer/src/index.ts"
-    ],
-    "skills": [
-      "./node_modules/@cheetahbyte/pi-subagents/skills"
     ]
   },
   "scripts": {
@@ -40,12 +36,10 @@
   },
   "dependencies": {
     "@cheetahbyte/pi-footer": "^0.5.2",
-    "@cheetahbyte/pi-subagents": "^0.21.0",
     "@earendil-works/pi-schema": "^1.5.0"
   },
   "bundledDependencies": [
-    "@cheetahbyte/pi-footer",
-    "@cheetahbyte/pi-subagents"
+    "@cheetahbyte/pi-footer"
   ],
   "peerDependencies": {
     "@earendil-works/pi-ai": "*",
