@@ -69,20 +69,6 @@
         "@earendil-works/pi-tui": "*",
       },
     },
-    "packages/pi-claude-code": {
-      "name": "@cheetahbyte/pi-claude-code",
-      "version": "0.3.0",
-      "devDependencies": {
-        "@earendil-works/pi-ai": "^1.5.0",
-        "@earendil-works/pi-coding-agent": "^1.0.2",
-        "@types/node": "^22",
-        "typescript": "^7",
-      },
-      "peerDependencies": {
-        "@earendil-works/pi-ai": "*",
-        "@earendil-works/pi-coding-agent": "*",
-      },
-    },
     "packages/pi-context": {
       "name": "@cheetahbyte/pi-context",
       "version": "0.3.0",
@@ -241,8 +227,6 @@
     "@cheetahbyte/pi-background-shell": ["@cheetahbyte/pi-background-shell@workspace:packages/pi-background-shell"],
 
     "@cheetahbyte/pi-btw": ["@cheetahbyte/pi-btw@workspace:packages/pi-btw"],
-
-    "@cheetahbyte/pi-claude-code": ["@cheetahbyte/pi-claude-code@workspace:packages/pi-claude-code"],
 
     "@cheetahbyte/pi-context": ["@cheetahbyte/pi-context@workspace:packages/pi-context"],
 

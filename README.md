@@ -29,7 +29,6 @@ Each package in `packages/` is also published on its own. Install one with `pi i
 | `@cheetahbyte/pi-ask-user-question` | The `ask_user_question` tool for structured questions. |
 | `@cheetahbyte/pi-background-shell` | Runs long shell commands in the background and tells the agent when they exit, with `/bg` and a footer count. |
 | `@cheetahbyte/pi-btw` | `/btw` asks a side question without adding it to the conversation. |
-| `@cheetahbyte/pi-claude-code` | `claude-sub` models on your Claude subscription through Claude Code, and `/claude-usage` for plan limits. |
 | `@cheetahbyte/pi-context` | `/context` shows what fills the context window. |
 | `@cheetahbyte/pi-header` | A compact header with prompts, skills, extensions, and context. |
 | `@cheetahbyte/pi-hooks` | Claude Code-style command hooks from `~/.pi/agent/hooks.json` and `.pi/hooks.json`. |
